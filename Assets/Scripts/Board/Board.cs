@@ -6,7 +6,7 @@ namespace Assets.Scripts.Board
     public class Board : MonoBehaviour
     {
         [SerializeField] private GameObject prefab;
-        [SerializeField] private Vector2 _boardSize;
+        [SerializeField] private Vector2 _boardSize = new Vector2(10, 20);
 
         private Tetromino Tetromino;
         private Vector2[] _TetrominoCoords;
@@ -18,7 +18,7 @@ namespace Assets.Scripts.Board
 
         private void Awake()
         {
-            _boardSize = new Vector2(10, 20);
+            //_boardSize = new Vector2(10, 20);
             _boardCells = new int[(int)_boardSize.x, (int)_boardSize.y];
             
             SpawnTetromino();
@@ -58,6 +58,7 @@ namespace Assets.Scripts.Board
             Vector3 pos = Tetromino.transform.position;
             Vector3 tetrominoCoord = new Vector3(pos.x - 0.5f, pos.y - 0.5f, pos.z); 
             SetTetrominoCoords(tetrominoCoord);
+            Tetromino.RearrangePieces();
 
             _rotationCount++;
         }
@@ -87,7 +88,9 @@ namespace Assets.Scripts.Board
                     return;
                 }
 
-                if (IsCellBlocked(coordX: X, coordY: Y) && direction.x == 0 && direction.y == -1)
+                var isCellUnderTetromino = direction.x == 0 && direction.y == -1;
+
+                if (IsCellBlocked(coordX: X, coordY: Y) && isCellUnderTetromino)
                 {
                     CleanUpAndPrepareNextTetromino();
                     return;
@@ -119,6 +122,9 @@ namespace Assets.Scripts.Board
         {
             foreach (var cell in _TetrominoCoords)
                 _boardCells[(int)cell.x, (int)cell.y] = 1;
+
+            // Если вся строка заблокирована, значит её надо удалить.
+            // Все заблокированные клетки сдвинуть вниз.
         }
 
         private bool IsCellOutOfBounds(float coordX)
