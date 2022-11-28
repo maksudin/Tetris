@@ -123,8 +123,30 @@ namespace Assets.Scripts.Board
             foreach (var cell in _TetrominoCoords)
                 _boardCells[(int)cell.x, (int)cell.y] = 1;
 
-            // Если вся строка заблокирована, значит её надо удалить.
-            // Все заблокированные клетки сдвинуть вниз.
+
+            FindAndRemoveBlockedRows();
+            // TODO: Все заблокированные клетки сдвинуть вниз.
+        }
+
+        private void FindAndRemoveBlockedRows()
+        {
+            int countBlocked;
+            for (int y = 0; y < _boardSize.y; y++)
+            {
+                countBlocked = 0;
+                for (int x = 0; x < _boardSize.x; x++)
+                    if (_boardCells[x, y] == 1)
+                        countBlocked++;
+
+                if (countBlocked == _boardSize.x)
+                    RemoveBlockedRow(y);
+            }
+        }
+
+        private void RemoveBlockedRow(int y)
+        {
+            for (int x = 0; x < _boardSize.x; x++)
+                _boardCells[x, y] = 0;
         }
 
         private bool IsCellOutOfBounds(float coordX)
