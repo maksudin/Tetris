@@ -13,16 +13,15 @@ namespace Assets.Scripts.Board
 
         private void Awake()
         {
-            piecesTransform = GetComponentsInChildren<Transform>();   
-            for (int i = 0; i < piecesTransform.Length - 1; i++)
-                piecesTransform[i].position = new Vector3(Pieces[i].XPos, Pieces[i].YPos, transform.position.z);
+            piecesTransform = GetComponentsInChildren<Transform>();
+            RearrangePieces();
         }
 
         public void RearrangePieces()
         {
             var pos = transform.position;
             for (int i = 0; i < piecesTransform.Length - 1; i++)
-                piecesTransform[i].position = new Vector3(Pieces[i].XPos + pos.x, Pieces[i].YPos + pos.y, pos.z);
+                piecesTransform[i + 1].position = new Vector3(Pieces[i].XPos + pos.x, Pieces[i].YPos + pos.y, pos.z);
         }
 
         private void OnDrawGizmosSelected()
