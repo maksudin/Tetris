@@ -18,7 +18,6 @@ namespace Assets.Scripts.Board
 
         private void Awake()
         {
-            //_boardSize = new Vector2(10, 20);
             _boardCells = new int[(int)_boardSize.x, (int)_boardSize.y];
             
             SpawnTetromino();
@@ -31,6 +30,12 @@ namespace Assets.Scripts.Board
         {
             var spawned = SpawnUtills.Spawn(prefab, Vector3.zero);
             Tetromino = spawned.GetComponent<Tetromino>();
+        }
+
+        public void Rush()
+        {
+            //TODO Move tetromino to the bottom
+
         }
 
         public void RotateClockWise()
@@ -113,34 +118,57 @@ namespace Assets.Scripts.Board
         private void CleanUpAndPrepareNextTetromino()
         {
             BlockTetrominoCells();
+            FindAndMoveBlockedRows();
             Destroy(Tetromino.gameObject);
             SpawnTetromino();
             SetTetrominoCoords(_tetrominoCenter);
+            _rotationCount = 0;
         }
 
         private void BlockTetrominoCells()
         {
             foreach (var cell in _TetrominoCoords)
                 _boardCells[(int)cell.x, (int)cell.y] = 1;
-
-
-            FindAndRemoveBlockedRows();
-            // TODO: ¬се заблокированные клетки сдвинуть вниз.
         }
 
-        private void FindAndRemoveBlockedRows()
+        private void FindAndMoveBlockedRows()
         {
-            int countBlocked;
             for (int y = 0; y < _boardSize.y; y++)
-            {
-                countBlocked = 0;
-                for (int x = 0; x < _boardSize.x; x++)
-                    if (_boardCells[x, y] == 1)
-                        countBlocked++;
-
-                if (countBlocked == _boardSize.x)
+                if (IsRowBlocked(y) && y != _boardSize.y - 1)
+                    MoveBlockedRowTo(fromIndex: y + 1, toIndex: y);
+                else if (IsRowBlocked(y))
                     RemoveBlockedRow(y);
-            }
+        }
+
+        private void MoveBlockedRowTo(int fromIndex, int toIndex)
+        {
+            int[] blockedRow = GetBlockedRow(fromIndex);
+            ReplaceRowWith(replaceIndex: toIndex, blockedRow);
+            RemoveBlockedRow(fromIndex);
+        }
+
+        private void ReplaceRowWith(int replaceIndex, int[] rowVals)
+        {
+            for (int x = 0; x < _boardSize.x; x++)
+                _boardCells[x, replaceIndex] = rowVals[x];
+        }
+
+        private int[] GetBlockedRow(int y)
+        {
+            int[] blockedRow = new int[(int)_boardSize.x];
+            for (int x = 0; x < _boardSize.x; x++)
+                blockedRow[x] = _boardCells[x, y];
+            return blockedRow;
+        }
+
+        private bool IsRowBlocked(int y)
+        {
+            int countBlocked = 0;
+            for (int x = 0; x < _boardSize.x; x++)
+                if (_boardCells[x, y] == 1)
+                    countBlocked++;
+
+            return countBlocked == _boardSize.x ? true : false;
         }
 
         private void RemoveBlockedRow(int y)
@@ -164,6 +192,9 @@ namespace Assets.Scripts.Board
             return _boardCells[(int)coordX, (int)coordY] == 1;
         }
 
+
+
+#if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             DrawUtils.DrawRectangle(new Vector3[5]
@@ -200,7 +231,7 @@ namespace Assets.Scripts.Board
             Gizmos.color = Color.white;
         }
 
-
+#endif
 
         private void SetTetrominoCoords(Vector3 tetrominoCenter)
         {

@@ -24,6 +24,7 @@ namespace Assets.Scripts.Board
                 piecesTransform[i + 1].position = new Vector3(Pieces[i].XPos + pos.x, Pieces[i].YPos + pos.y, pos.z);
         }
 
+#if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
             Vector3 pos = transform.position;
@@ -44,6 +45,7 @@ namespace Assets.Scripts.Board
 
             Gizmos.color = Color.white;
         }
+#endif
     }
 
     [Serializable]

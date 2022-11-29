@@ -44,6 +44,15 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Rush"",
+                    ""type"": ""Button"",
+                    ""id"": ""4d44232c-486f-421d-afd4-fcef73775793"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -112,6 +121,17 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
                     ""action"": ""Rotation"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6ccaeb70-fb65-43ab-8b93-d69346777666"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Rush"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -122,6 +142,7 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
         m_PieceMap = asset.FindActionMap("PieceMap", throwIfNotFound: true);
         m_PieceMap_HorizontalMovement = m_PieceMap.FindAction("Horizontal Movement", throwIfNotFound: true);
         m_PieceMap_Rotation = m_PieceMap.FindAction("Rotation", throwIfNotFound: true);
+        m_PieceMap_Rush = m_PieceMap.FindAction("Rush", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -183,12 +204,14 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
     private IPieceMapActions m_PieceMapActionsCallbackInterface;
     private readonly InputAction m_PieceMap_HorizontalMovement;
     private readonly InputAction m_PieceMap_Rotation;
+    private readonly InputAction m_PieceMap_Rush;
     public struct PieceMapActions
     {
         private @PieceActions m_Wrapper;
         public PieceMapActions(@PieceActions wrapper) { m_Wrapper = wrapper; }
         public InputAction @HorizontalMovement => m_Wrapper.m_PieceMap_HorizontalMovement;
         public InputAction @Rotation => m_Wrapper.m_PieceMap_Rotation;
+        public InputAction @Rush => m_Wrapper.m_PieceMap_Rush;
         public InputActionMap Get() { return m_Wrapper.m_PieceMap; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -204,6 +227,9 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
                 @Rotation.started -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnRotation;
                 @Rotation.performed -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnRotation;
                 @Rotation.canceled -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnRotation;
+                @Rush.started -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnRush;
+                @Rush.performed -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnRush;
+                @Rush.canceled -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnRush;
             }
             m_Wrapper.m_PieceMapActionsCallbackInterface = instance;
             if (instance != null)
@@ -214,6 +240,9 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
                 @Rotation.started += instance.OnRotation;
                 @Rotation.performed += instance.OnRotation;
                 @Rotation.canceled += instance.OnRotation;
+                @Rush.started += instance.OnRush;
+                @Rush.performed += instance.OnRush;
+                @Rush.canceled += instance.OnRush;
             }
         }
     }
@@ -222,5 +251,6 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
     {
         void OnHorizontalMovement(InputAction.CallbackContext context);
         void OnRotation(InputAction.CallbackContext context);
+        void OnRush(InputAction.CallbackContext context);
     }
 }
