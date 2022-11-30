@@ -19,7 +19,7 @@ namespace Assets.Scripts.Board
         public void OnRotation(InputAction.CallbackContext context)
         {
             if (context.performed)
-                _board.RotateClockWise();
+                _board.RotateClockwise();
         }
 
         public void OnRush(InputAction.CallbackContext context)

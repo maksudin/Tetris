@@ -28,14 +28,17 @@ namespace Assets.Scripts.Board
             SetTetrominoCoords(_tetrominoCenter);
         }
 
-        private float nextActionTime = 0.0f;
-        public float period = 0.1f;
+        private float _nextFallTime = 0.0f;
+        [Range(0, 1)]
+        [SerializeField] private float _fallSpeed = 0.1f;
+        [SerializeField] private bool FallEnabled;
 
         private void Update()
         {
-            if (Time.time > nextActionTime)
+            if (!FallEnabled) return;
+            if (Time.time > _nextFallTime)
             {
-                nextActionTime += period;
+                _nextFallTime += _fallSpeed;
                 Movement(new Vector2(0, -1));
             }
         }
@@ -52,15 +55,15 @@ namespace Assets.Scripts.Board
             Movement(new Vector2(0, -1));
         }
 
-        public void RotateClockWise()
+        public void RotateClockwise()
         {
             var rotationsLen = Tetromino.Rotations.Length;
             var rotationPieces = Tetromino.Rotations[_rotationCount % rotationsLen].Pieces;
 
             for (int i = 0; i < rotationPieces.Length; i++)
             {
-                var X = rotationPieces[i].XPos + _TetrominoCoords[i].x;
-                var Y = rotationPieces[i].YPos + _TetrominoCoords[i].y;
+                var X = rotationPieces[i].XPos + _TetrominoCoords[0].x;
+                var Y = rotationPieces[i].YPos + _TetrominoCoords[0].y;
 
                 if (IsCellOutOfBounds(coordX: X))
                     return;
@@ -86,7 +89,10 @@ namespace Assets.Scripts.Board
         {
             if (_isRush) return;
             _direction = direction;
-            Movement(new Vector2(_direction.x, 0));
+            if (FallEnabled) 
+                Movement(new Vector2(_direction.x, 0));
+            else
+                Movement(_direction);
         }
 
         private void Movement(Vector2 direction)
@@ -135,6 +141,7 @@ namespace Assets.Scripts.Board
         {
             BlockTetrominoCells();
             FindAndMoveBlockedRows();
+            // TODO: Отрисовать заблокированные клетки?
             Destroy(Tetromino.gameObject);
             SpawnTetromino();
             SetTetrominoCoords(_tetrominoCenter);
