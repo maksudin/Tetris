@@ -9,6 +9,7 @@
 /obj/
 /out
 /.vscode/
+/Logs/
 *.sln
 *.userprefs
 *.csproj

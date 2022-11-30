@@ -208,6 +208,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 1141be6e-ef28-4a29-afb0-0478573d1efc
     m_ActionName: PieceMap/Rotation[/Keyboard/r]
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 519420033}
+        m_TargetAssemblyTypeName: Assets.Scripts.Board.BoardInputReader, Assembly-CSharp
+        m_MethodName: OnRush
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 4d44232c-486f-421d-afd4-fcef73775793
+    m_ActionName: PieceMap/Rush[/Keyboard/space]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: PieceMap

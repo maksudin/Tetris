@@ -16,6 +16,8 @@ namespace Assets.Scripts.Board
         private int[,] _boardCells;
         private int _rotationCount;
 
+        private bool _isRush;
+
         private void Awake()
         {
             _boardCells = new int[(int)_boardSize.x, (int)_boardSize.y];
@@ -34,8 +36,8 @@ namespace Assets.Scripts.Board
 
         public void Rush()
         {
-            //TODO Move tetromino to the bottom
-
+            _isRush = true;
+            Movement(new Vector2(0, -1));
         }
 
         public void RotateClockWise()
@@ -70,6 +72,7 @@ namespace Assets.Scripts.Board
 
         public void Move(Vector2 direction)
         {
+            if (_isRush) return;
             _direction = direction;
             Movement(_direction);
         }
@@ -85,11 +88,15 @@ namespace Assets.Scripts.Board
                 var Y = coord.y + direction.y;
 
                 if (IsCellOutOfBounds(coordX: X))
+                {
+                    _isRush = false;
                     return;
+                }
 
                 if (IsBottomReached(coordY: Y))
                 {
                     CleanUpAndPrepareNextTetromino();
+                    _isRush = false;
                     return;
                 }
 
@@ -98,10 +105,12 @@ namespace Assets.Scripts.Board
                 if (IsCellBlocked(coordX: X, coordY: Y) && isCellUnderTetromino)
                 {
                     CleanUpAndPrepareNextTetromino();
+                    _isRush = false;
                     return;
                 }
                 else if (IsCellBlocked(coordX: X, coordY: Y))
                 {
+                    _isRush = false;
                     return;
                 }
             }
@@ -113,6 +122,10 @@ namespace Assets.Scripts.Board
             }
 
             Tetromino.transform.position = new Vector3(boardPos.x + direction.x, boardPos.y + direction.y, boardPos.z);
+
+            if (_isRush)
+                Movement(new Vector2(0, -1));
+
         }
 
         private void CleanUpAndPrepareNextTetromino()
@@ -134,10 +147,18 @@ namespace Assets.Scripts.Board
         private void FindAndMoveBlockedRows()
         {
             for (int y = 0; y < _boardSize.y; y++)
-                if (IsRowBlocked(y) && y != _boardSize.y - 1)
-                    MoveBlockedRowTo(fromIndex: y + 1, toIndex: y);
+            {
+                bool upperEdge = y == _boardSize.y - 1;
+                if (IsRowBlocked(y) && !upperEdge)
+                {
+                    for (int i = (int)_boardSize.y - 1; i < 1; i--)
+                    {
+                        MoveBlockedRowTo(fromIndex: i, toIndex: i - 1);
+                    }
+                }
                 else if (IsRowBlocked(y))
                     RemoveBlockedRow(y);
+            }
         }
 
         private void MoveBlockedRowTo(int fromIndex, int toIndex)
