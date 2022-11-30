@@ -28,6 +28,18 @@ namespace Assets.Scripts.Board
             SetTetrominoCoords(_tetrominoCenter);
         }
 
+        private float nextActionTime = 0.0f;
+        public float period = 0.1f;
+
+        private void Update()
+        {
+            if (Time.time > nextActionTime)
+            {
+                nextActionTime += period;
+                Movement(new Vector2(0, -1));
+            }
+        }
+
         private void SpawnTetromino()
         {
             var spawned = SpawnUtills.Spawn(prefab, Vector3.zero);
@@ -74,7 +86,7 @@ namespace Assets.Scripts.Board
         {
             if (_isRush) return;
             _direction = direction;
-            Movement(_direction);
+            Movement(new Vector2(_direction.x, 0));
         }
 
         private void Movement(Vector2 direction)
