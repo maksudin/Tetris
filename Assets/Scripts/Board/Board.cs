@@ -5,7 +5,8 @@ namespace Assets.Scripts.Board
 {
     public class Board : MonoBehaviour
     {
-        [SerializeField] private GameObject prefab;
+        [SerializeField] private GameObject _tetrominoPrefab;
+        [SerializeField] private GameObject _blockedCellPrefab;
         [SerializeField] private Vector2 _boardSize = new Vector2(10, 20);
 
         private Tetromino Tetromino;
@@ -17,6 +18,8 @@ namespace Assets.Scripts.Board
         private int _rotationCount;
 
         private bool _isRush;
+
+        private BlockedCell[] _blockedCells;
 
         private void Awake()
         {
@@ -43,9 +46,19 @@ namespace Assets.Scripts.Board
             }
         }
 
+        private void FindBlockedCellObjects()
+        {
+            _blockedCells = FindObjectsOfType<BlockedCell>();
+        }
+
+        private GameObject SpawnBlockedCell()
+        {
+            return SpawnUtills.Spawn(_blockedCellPrefab, Vector3.zero);
+        }
+
         private void SpawnTetromino()
         {
-            var spawned = SpawnUtills.Spawn(prefab, Vector3.zero);
+            var spawned = SpawnUtills.Spawn(_tetrominoPrefab, Vector3.zero);
             Tetromino = spawned.GetComponent<Tetromino>();
         }
 
@@ -151,12 +164,21 @@ namespace Assets.Scripts.Board
 
         private void BlockTetrominoCells()
         {
+            GameObject spawned;
             foreach (var cell in _TetrominoCoords)
+            {
                 _boardCells[(int)cell.x, (int)cell.y] = 1;
+                spawned = SpawnBlockedCell();
+                BlockedCell blocked = spawned.GetComponent<BlockedCell>();
+                blocked.Piece.XPos = (int)cell.x;
+                blocked.Piece.YPos = (int)cell.y;
+                spawned.transform.position = new Vector3((int)cell.x + 0.5f, (int)cell.y + 0.5f, transform.position.z);
+            }
         }
 
         private void FindAndMoveBlockedRows()
         {
+            FindBlockedCellObjects();
             for (int y = 0; y < _boardSize.y - 1; y++)
             {
                 bool upperEdge = (y == _boardSize.y - 1);
@@ -202,7 +224,17 @@ namespace Assets.Scripts.Board
         private void RemoveBlockedRow(int y)
         {
             for (int x = 0; x < _boardSize.x; x++)
+            {
                 _boardCells[x, y] = 0;
+                DestroyBlockedCell(x, y);
+            }
+        }
+
+        private void DestroyBlockedCell(int x, int y)
+        {
+            foreach (var cell in _blockedCells)
+                if (cell.Piece.XPos == x && cell.Piece.YPos == y)
+                    Destroy(cell.gameObject);
         }
 
         private bool IsCellOutOfBounds(float coordX)

@@ -373,7 +373,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36a9ced1ed2177a4e852b68433dca383, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab: {fileID: 1414469315200352078, guid: d436b0c9b918f1b4d88bc30637b885eb, type: 3}
+  _tetrominoPrefab: {fileID: 1414469315200352078, guid: d436b0c9b918f1b4d88bc30637b885eb, type: 3}
+  _blockedCellPrefab: {fileID: 632761194083501790, guid: a37182118a7d4bb4f9a821f539c38637, type: 3}
   _boardSize: {x: 10, y: 20}
   _fallSpeed: 0.51
   FallEnabled: 0

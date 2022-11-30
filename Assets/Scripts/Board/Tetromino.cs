@@ -8,7 +8,7 @@ namespace Assets.Scripts.Board
     {
         [SerializeField] private Sprite _sprite;
         [SerializeField] public Rotations[] Rotations;
-        public Pieces[] Pieces;
+        public Piece[] Pieces;
         private Transform[] piecesTransform;
 
         private void Awake()
@@ -49,16 +49,17 @@ namespace Assets.Scripts.Board
     }
 
     [Serializable]
-    public class Pieces
+    public class Piece
     {
         public int XPos;
         public int YPos;
+        //public Sprite Sprite;
     }
 
     [Serializable]
     public class Rotations
     {
         public bool Show;
-        public Pieces[] Pieces;
+        public Piece[] Pieces;
     }
 }
