@@ -1,3 +1,4 @@
+using System;
 using Assets.Scripts.Utils;
 using UnityEngine;
 
@@ -154,12 +155,43 @@ namespace Assets.Scripts.Board
         {
             BlockTetrominoCells();
             FindAndMoveBlockedRows();
-            // TODO: Отрисовать заблокированные клетки?
+            ResetSpawnedBlocks();
             Destroy(Tetromino.gameObject);
             SpawnTetromino();
             SetTetrominoCoords(_tetrominoCenter);
             _rotationCount = 0;
             _isRush = false;
+        }
+
+        private void ResetSpawnedBlocks()
+        {
+            FindBlockedCellObjects();
+            for (int x = 0; x < _boardSize.x; x++)
+                for (int y = 0; y < _boardSize.y; y++)
+                {
+                    var blockedCell = FindBlockedCell(x, y);
+                    if (_boardCells[x, y] == 1 && blockedCell == null)
+                    {
+                        GameObject spawned = SpawnBlockedCell();
+                        BlockedCell blocked = spawned.GetComponent<BlockedCell>();
+                        blocked.Piece.XPos = x;
+                        blocked.Piece.YPos = y;
+                        spawned.transform.position = new Vector3(x + 0.5f, y + 0.5f, transform.position.z);
+                        continue;
+                    }
+                    if (_boardCells[x, y] == 0 && blockedCell != null)
+                        Destroy(blockedCell.gameObject);
+
+                }
+        }
+
+        private BlockedCell FindBlockedCell(int x, int y)
+        {
+            foreach (var cell in _blockedCells)
+                if (cell.Piece.XPos == x && cell.Piece.YPos == y)
+                    return cell;
+
+            return null;
         }
 
         private void BlockTetrominoCells()
@@ -168,32 +200,38 @@ namespace Assets.Scripts.Board
             foreach (var cell in _TetrominoCoords)
             {
                 _boardCells[(int)cell.x, (int)cell.y] = 1;
-                spawned = SpawnBlockedCell();
-                BlockedCell blocked = spawned.GetComponent<BlockedCell>();
-                blocked.Piece.XPos = (int)cell.x;
-                blocked.Piece.YPos = (int)cell.y;
-                spawned.transform.position = new Vector3((int)cell.x + 0.5f, (int)cell.y + 0.5f, transform.position.z);
+                //spawned = SpawnBlockedCell();
+                //BlockedCell blocked = spawned.GetComponent<BlockedCell>();
+                //blocked.Piece.XPos = (int)cell.x;
+                //blocked.Piece.YPos = (int)cell.y;
+                //spawned.transform.position = new Vector3((int)cell.x + 0.5f, (int)cell.y + 0.5f, transform.position.z);
             }
         }
 
         private void FindAndMoveBlockedRows()
         {
-            FindBlockedCellObjects();
             for (int y = 0; y < _boardSize.y - 1; y++)
             {
-                bool upperEdge = (y == _boardSize.y - 1);
-                if (IsRowBlocked(y) && !upperEdge)
-                    for (int i = 0; i < _boardSize.y - 1; i++)
-                        MoveBlockedRowTo(fromIndex: i + 1, toIndex: i);
-                else if (IsRowBlocked(y))
+                bool upperEdge = y == _boardSize.y - 1;
+                bool isRowBlocked = IsRowBlocked(y);
+                if (isRowBlocked && !upperEdge)
+                {
+                    RemoveBlockedRow(y);
+                    for (int i = y; i < _boardSize.y - 1; i++)
+                        MoveRowTo(fromIndex: i + 1, toIndex: i);
+
+                    FindAndMoveBlockedRows();
+                }
+
+                else if (isRowBlocked)
                     RemoveBlockedRow(y);
             }
         }
 
-        private void MoveBlockedRowTo(int fromIndex, int toIndex)
+        private void MoveRowTo(int fromIndex, int toIndex)
         {
-            int[] blockedRow = GetBlockedRow(fromIndex);
-            ReplaceRowWith(replaceIndex: toIndex, blockedRow);
+            int[] row = GetBlockedRow(fromIndex);
+            ReplaceRowWith(replaceIndex: toIndex, row);
             RemoveBlockedRow(fromIndex);
         }
 
@@ -226,7 +264,7 @@ namespace Assets.Scripts.Board
             for (int x = 0; x < _boardSize.x; x++)
             {
                 _boardCells[x, y] = 0;
-                DestroyBlockedCell(x, y);
+                //DestroyBlockedCell(x, y - 1);
             }
         }
 
