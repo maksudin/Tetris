@@ -1,4 +1,3 @@
-using System;
 using Assets.Scripts.Utils;
 using UnityEngine;
 
@@ -6,7 +5,7 @@ namespace Assets.Scripts.Board
 {
     public class Board : MonoBehaviour
     {
-        [SerializeField] private GameObject _tetrominoPrefab;
+        private GameObject _tetrominoPrefab;
         [SerializeField] private GameObject _blockedCellPrefab;
         [SerializeField] private Vector2 _boardSize = new Vector2(10, 20);
 
@@ -21,11 +20,13 @@ namespace Assets.Scripts.Board
         private bool _isRush;
 
         private BlockedCell[] _blockedCells;
+        private TGMRandomizer _tGMRandomizer;
 
-        private void Awake()
+        private void Start()
         {
             _boardCells = new int[(int)_boardSize.x, (int)_boardSize.y];
-            
+            _tGMRandomizer = GetComponent<TGMRandomizer>();
+            _tetrominoPrefab = _tGMRandomizer.GetRandomizedPrefab(isFirstTetromino: true);
             SpawnTetromino();
 
             _tetrominoCenter = new Vector3(1, 18, 0);
@@ -157,6 +158,7 @@ namespace Assets.Scripts.Board
             FindAndMoveBlockedRows();
             ResetSpawnedBlocks();
             Destroy(Tetromino.gameObject);
+            _tetrominoPrefab = _tGMRandomizer.GetRandomizedPrefab(isFirstTetromino: true);
             SpawnTetromino();
             SetTetrominoCoords(_tetrominoCenter);
             _rotationCount = 0;
@@ -196,16 +198,8 @@ namespace Assets.Scripts.Board
 
         private void BlockTetrominoCells()
         {
-            GameObject spawned;
             foreach (var cell in _TetrominoCoords)
-            {
                 _boardCells[(int)cell.x, (int)cell.y] = 1;
-                //spawned = SpawnBlockedCell();
-                //BlockedCell blocked = spawned.GetComponent<BlockedCell>();
-                //blocked.Piece.XPos = (int)cell.x;
-                //blocked.Piece.YPos = (int)cell.y;
-                //spawned.transform.position = new Vector3((int)cell.x + 0.5f, (int)cell.y + 0.5f, transform.position.z);
-            }
         }
 
         private void FindAndMoveBlockedRows()

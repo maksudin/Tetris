@@ -340,6 +340,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1864185036}
   - component: {fileID: 1864185037}
+  - component: {fileID: 1864185038}
   m_Layer: 0
   m_Name: Board
   m_TagString: Untagged
@@ -373,8 +374,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36a9ced1ed2177a4e852b68433dca383, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _tetrominoPrefab: {fileID: 1414469315200352078, guid: d436b0c9b918f1b4d88bc30637b885eb, type: 3}
   _blockedCellPrefab: {fileID: 632761194083501790, guid: a37182118a7d4bb4f9a821f539c38637, type: 3}
   _boardSize: {x: 10, y: 20}
   _fallSpeed: 0.51
   FallEnabled: 0
+--- !u!114 &1864185038
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1864185035}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19fd3b5f5e04e7d43b9b47f481b0ead0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _tetrominoPrefabs:
+  - {fileID: 1414469315200352078, guid: d436b0c9b918f1b4d88bc30637b885eb, type: 3}
+  - {fileID: 4666471531050887686, guid: ccb0e2e1c924ada48839d2d410f23de6, type: 3}
+  - {fileID: 869172341817093365, guid: 2b384b8e24f3f1e4e9aa8b2b7db37c4d, type: 3}
+  - {fileID: 3179053951986717081, guid: 6fe64b9073dbbd044b7468eefb520b3d, type: 3}
+  - {fileID: 3973464581318347172, guid: 4185b635dbb6e9e4ca3270c9a759c1cd, type: 3}
+  - {fileID: 30142828676625935, guid: fcd40b7e50436bf458cf7a54cd28b61d, type: 3}
+  - {fileID: 6658771392403470579, guid: ee0474fb3ac74f44d945ff5269d71795, type: 3}
+  _noOfTypes: 7
+  _shapeHistory: 
+  _tries: 4
