@@ -158,7 +158,7 @@ namespace Assets.Scripts.Board
             FindAndMoveBlockedRows();
             ResetSpawnedBlocks();
             Destroy(Tetromino.gameObject);
-            _tetrominoPrefab = _tGMRandomizer.GetRandomizedPrefab(isFirstTetromino: true);
+            _tetrominoPrefab = _tGMRandomizer.GetRandomizedPrefab(isFirstTetromino: false);
             SpawnTetromino();
             SetTetrominoCoords(_tetrominoCenter);
             _rotationCount = 0;
@@ -175,6 +175,7 @@ namespace Assets.Scripts.Board
                     if (_boardCells[x, y] == 1 && blockedCell == null)
                     {
                         GameObject spawned = SpawnBlockedCell();
+                        spawned.GetComponent<SpriteRenderer>().sprite = Tetromino.Sprite;
                         BlockedCell blocked = spawned.GetComponent<BlockedCell>();
                         blocked.Piece.XPos = x;
                         blocked.Piece.YPos = y;

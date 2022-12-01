@@ -212,7 +212,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _shape: 3
-  _sprite: {fileID: 21300000, guid: 6ce53eefa145ca34baaf5e4a265f51af, type: 3}
+  Sprite: {fileID: 21300000, guid: 6ce53eefa145ca34baaf5e4a265f51af, type: 3}
   Rotations:
   - Show: 0
     Pieces:

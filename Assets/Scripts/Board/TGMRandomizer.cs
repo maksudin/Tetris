@@ -8,7 +8,7 @@ namespace Assets.Scripts.Board
         [SerializeField] private int _noOfTypes = 7;
         [SerializeField] private Shape[] _shapeHistory;
         [SerializeField] private int _tries = 4;
-        private int _countTries;
+        //private int _countTries;
 
         private void Awake()
         {
@@ -21,30 +21,35 @@ namespace Assets.Scripts.Board
 
         public GameObject GetRandomizedPrefab(bool isFirstTetromino = false)
         {
-            int randomValue = RandomizeTetrominoType(isFirstTetromino);
-            var tetrominoPrefab = _tetrominoPrefabs[randomValue];
-            var nextShape = tetrominoPrefab.GetComponent<Tetromino>()._shape;
+            int randomValue;
+            GameObject tetrominoPrefab = null;
+            Shape nextShape = Shape.I;
 
-            foreach (var shape in _shapeHistory)
+            for (int countTries = 0; countTries < _tries; countTries++)
             {
-                if (nextShape == shape && _countTries != _tries)
-                {
-                    _countTries++;
-                    GetRandomizedPrefab(isFirstTetromino);
-                }
-                else
-                {
-                    _countTries = 0;
+                randomValue = RandomizeTetrominoType(isFirstTetromino);
+                tetrominoPrefab = _tetrominoPrefabs[randomValue];
+                nextShape = tetrominoPrefab.GetComponent<Tetromino>()._shape;
+
+                if (!IsShapeInHistory(nextShape))
                     break;
-                }
             }
 
-            AddHistory(nextShape);
+            AddShapeToHistory(nextShape);
 
             return tetrominoPrefab;
         }
 
-        private void AddHistory(Shape shape)
+        public bool IsShapeInHistory(Shape shape)
+        {
+            foreach (var shapeH in _shapeHistory)
+                if (shape == shapeH)
+                    return true;
+
+            return false;
+        }
+
+        private void AddShapeToHistory(Shape shape)
         {
             Shape[] _history = new Shape[4]
             {

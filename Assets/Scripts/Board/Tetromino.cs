@@ -7,7 +7,7 @@ namespace Assets.Scripts.Board
     public class Tetromino : MonoBehaviour
     {
         [SerializeField] public Shape _shape;
-        [SerializeField] private Sprite _sprite;
+        [SerializeField] public Sprite Sprite;
         [SerializeField] public Rotations[] Rotations;
         public Piece[] Pieces;
         private Transform[] piecesTransform;
@@ -15,7 +15,15 @@ namespace Assets.Scripts.Board
         private void Awake()
         {
             piecesTransform = GetComponentsInChildren<Transform>();
+            ApplySprites();
             RearrangePieces();
+        }
+
+        private void ApplySprites()
+        {
+            var spriteRenders = GetComponentsInChildren<SpriteRenderer>();
+            foreach (var render in spriteRenders)
+                render.sprite = Sprite;
         }
 
         public void RearrangePieces()

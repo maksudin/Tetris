@@ -376,8 +376,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _blockedCellPrefab: {fileID: 632761194083501790, guid: a37182118a7d4bb4f9a821f539c38637, type: 3}
   _boardSize: {x: 10, y: 20}
-  _fallSpeed: 0.51
-  FallEnabled: 0
+  _fallSpeed: 0.34
+  FallEnabled: 1
 --- !u!114 &1864185038
 MonoBehaviour:
   m_ObjectHideFlags: 0
