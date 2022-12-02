@@ -5,10 +5,8 @@ namespace Assets.Scripts.Board
     public class TGMRandomizer : MonoBehaviour
     {
         [SerializeField] private GameObject[] _tetrominoPrefabs;
-        [SerializeField] private int _noOfTypes = 7;
-        [SerializeField] private Shape[] _shapeHistory;
         [SerializeField] private int _tries = 4;
-        //private int _countTries;
+        [SerializeField] private Shape[] _shapeHistory;
 
         private void Awake()
         {
@@ -64,11 +62,12 @@ namespace Assets.Scripts.Board
 
         private int RandomizeTetrominoType(bool isFirstTetromino)
         {
+            var numOfTypes = _tetrominoPrefabs.Length;
             if (isFirstTetromino)
                 // The game never deals an S, Z or O as the first piece, to avoid a forced overhang.
-                return (int)System.Math.Floor( Random.value * ( _noOfTypes - 3 ) );
+                return (int)System.Math.Floor( Random.value * (numOfTypes - 3 ) );
 
-            return (int) System.Math.Floor(Random.value * _noOfTypes);
+            return (int) System.Math.Floor(Random.value * numOfTypes);
         }
     }
 }

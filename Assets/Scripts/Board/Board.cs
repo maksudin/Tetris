@@ -158,11 +158,31 @@ namespace Assets.Scripts.Board
             FindAndMoveBlockedRows();
             ResetSpawnedBlocks();
             Destroy(Tetromino.gameObject);
+
+            // Check upper row reached
+            if (CheckUpperRowReached())
+            {
+                _rotationCount = 0;
+                _isRush = false;
+                // Thats the end of the game
+                return;
+            }
+
+
             _tetrominoPrefab = _tGMRandomizer.GetRandomizedPrefab(isFirstTetromino: false);
             SpawnTetromino();
             SetTetrominoCoords(_tetrominoCenter);
             _rotationCount = 0;
             _isRush = false;
+        }
+
+        private bool CheckUpperRowReached()
+        {
+            for (int x = 0; x < _boardSize.x; x++)
+                if (_boardCells[x, (int)_boardSize.y - 1] == 1)
+                    return true;
+
+            return false;
         }
 
         private void ResetSpawnedBlocks()
@@ -257,17 +277,7 @@ namespace Assets.Scripts.Board
         private void RemoveBlockedRow(int y)
         {
             for (int x = 0; x < _boardSize.x; x++)
-            {
                 _boardCells[x, y] = 0;
-                //DestroyBlockedCell(x, y - 1);
-            }
-        }
-
-        private void DestroyBlockedCell(int x, int y)
-        {
-            foreach (var cell in _blockedCells)
-                if (cell.Piece.XPos == x && cell.Piece.YPos == y)
-                    Destroy(cell.gameObject);
         }
 
         private bool IsCellOutOfBounds(float coordX)
@@ -285,31 +295,29 @@ namespace Assets.Scripts.Board
             return _boardCells[(int)coordX, (int)coordY] == 1;
         }
 
-
-
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             DrawUtils.DrawRectangle(new Vector3[5]
                 {
                     new Vector3(0,0,0),
-                    new Vector3(10,0,0),
-                    new Vector3(10,20,0),
-                    new Vector3(0,20,0),
+                    new Vector3(_boardSize.x,0,0),
+                    new Vector3(_boardSize.x,_boardSize.y,0),
+                    new Vector3(0,_boardSize.y,0),
                     new Vector3(0,0,0)
                 }
             );
 
-            Vector3 pos = transform.position;
+            //Vector3 pos = transform.position;
 
-            if (_TetrominoCoords.Length != 0)
-            {
-                // Tetromino
-                foreach (var coord in _TetrominoCoords)
-                    DrawUtils.DrawCell(pos, coord);
-            }
+            //if (_TetrominoCoords.Length != 0)
+            //{
+            //    // Tetromino
+            //    foreach (var coord in _TetrominoCoords)
+            //        DrawUtils.DrawCell(pos, coord);
+            //}
 
-            DrawBlockedCells(pos);
+            //DrawBlockedCells(pos);
         }
 
         private void DrawBlockedCells(Vector3 pos)
