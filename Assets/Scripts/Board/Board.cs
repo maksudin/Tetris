@@ -204,7 +204,6 @@ namespace Assets.Scripts.Board
                     }
                     if (_boardCells[x, y] == 0 && blockedCell != null)
                         Destroy(blockedCell.gameObject);
-
                 }
         }
 
@@ -298,6 +297,7 @@ namespace Assets.Scripts.Board
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
+            Gizmos.color = Color.red;
             DrawUtils.DrawRectangle(new Vector3[5]
                 {
                     new Vector3(0,0,0),
@@ -307,6 +307,9 @@ namespace Assets.Scripts.Board
                     new Vector3(0,0,0)
                 }
             );
+
+            Gizmos.color = Color.white;
+
 
             //Vector3 pos = transform.position;
 

@@ -6,11 +6,11 @@ namespace Assets.Scripts.Board
     {
         [SerializeField] private GameObject[] _tetrominoPrefabs;
         [SerializeField] private int _tries = 4;
-        [SerializeField] private Shape[] _shapeHistory;
+        [SerializeField] private Shape[] _shapesHistory;
 
         private void Awake()
         {
-            _shapeHistory = new Shape[4]
+            _shapesHistory = new Shape[4]
             {
                 Shape.Z, Shape.Z, Shape.Z, Shape.Z // TGM1
                 //Shape.Z, Shape.Z, Shape.S, Shape.S // TGM2
@@ -27,7 +27,7 @@ namespace Assets.Scripts.Board
             {
                 randomValue = RandomizeTetrominoType(isFirstTetromino);
                 tetrominoPrefab = _tetrominoPrefabs[randomValue];
-                nextShape = tetrominoPrefab.GetComponent<Tetromino>()._shape;
+                nextShape = tetrominoPrefab.GetComponent<Tetromino>().Shape;
 
                 if (!IsShapeInHistory(nextShape))
                     break;
@@ -40,7 +40,7 @@ namespace Assets.Scripts.Board
 
         public bool IsShapeInHistory(Shape shape)
         {
-            foreach (var shapeH in _shapeHistory)
+            foreach (var shapeH in _shapesHistory)
                 if (shape == shapeH)
                     return true;
 
@@ -51,13 +51,13 @@ namespace Assets.Scripts.Board
         {
             Shape[] _history = new Shape[4]
             {
-                _shapeHistory[1],
-                _shapeHistory[2],
-                _shapeHistory[3],
+                _shapesHistory[1],
+                _shapesHistory[2],
+                _shapesHistory[3],
                 shape
             };
 
-            _shapeHistory = _history;
+            _shapesHistory = _history;
         }
 
         private int RandomizeTetrominoType(bool isFirstTetromino)

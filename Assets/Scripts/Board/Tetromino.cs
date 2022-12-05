@@ -6,7 +6,7 @@ namespace Assets.Scripts.Board
 {
     public class Tetromino : MonoBehaviour
     {
-        [SerializeField] public Shape _shape;
+        [SerializeField] public Shape Shape;
         [SerializeField] public Sprite Sprite;
         [SerializeField] public Rotations[] Rotations;
         public Piece[] Pieces;
