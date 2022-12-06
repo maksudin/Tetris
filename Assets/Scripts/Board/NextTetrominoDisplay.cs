@@ -23,6 +23,7 @@ namespace Assets.Scripts.Board
             Prefab = spawned;
         }
 
+#if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             var pos = transform.position;
@@ -38,5 +39,6 @@ namespace Assets.Scripts.Board
             );
             Gizmos.color = Color.white;
         }
+#endif
     }
 }

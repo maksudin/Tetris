@@ -10,11 +10,11 @@ namespace Assets.Scripts.Board
         public Sprite Sprite;
         public Rotations[] Rotations;
         public Piece[] Pieces;
-        private Transform[] piecesTransform;
+        private Transform[] _piecesTransform;
 
         private void Awake()
         {
-            piecesTransform = GetComponentsInChildren<Transform>();
+            _piecesTransform = GetComponentsInChildren<Transform>();
             ApplySprites();
             RearrangePieces();
         }
@@ -29,8 +29,8 @@ namespace Assets.Scripts.Board
         public void RearrangePieces()
         {
             var pos = transform.position;
-            for (int i = 0; i < piecesTransform.Length - 1; i++)
-                piecesTransform[i + 1].position = new Vector3(Pieces[i].XPos + pos.x, Pieces[i].YPos + pos.y, pos.z);
+            for (int i = 0; i < _piecesTransform.Length - 1; i++)
+                _piecesTransform[i + 1].position = new Vector3(Pieces[i].XPos + pos.x, Pieces[i].YPos + pos.y, pos.z);
         }
 
 #if UNITY_EDITOR

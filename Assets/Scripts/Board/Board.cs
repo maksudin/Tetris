@@ -11,9 +11,8 @@ namespace Assets.Scripts.Board
 
         private GameObject _tetrominoPrefab;
 
-        private Tetromino Tetromino;
+        private Tetromino _tetromino;
         private Vector2[] _tetrominoCoords;
-        private Vector3 _tetrominoCenter;
 
         private Vector2 _direction;
         private int[,] _boardCells;
@@ -35,8 +34,6 @@ namespace Assets.Scripts.Board
 
             UpdateNextTetrominoDisplay();
             SpawnTetromino();
-
-            _tetrominoCenter = new Vector3(1, 18, 0);
             SetTetrominoCoords(_spawnPivot.position);
         }
 
@@ -68,7 +65,7 @@ namespace Assets.Scripts.Board
         private void SpawnTetromino()
         {
             var spawned = SpawnUtills.Spawn(_tetrominoPrefab, _spawnPivot.position);
-            Tetromino = spawned.GetComponent<Tetromino>();
+            _tetromino = spawned.GetComponent<Tetromino>();
         }
 
         public void Rush()
@@ -80,14 +77,14 @@ namespace Assets.Scripts.Board
         public void RotateTetromino(bool isClockwise = true)
         {
             if (_rotationCount == 0 && isClockwise == false)
-                _rotationCount = Tetromino.Rotations.Length - 1;
+                _rotationCount = _tetromino.Rotations.Length - 1;
             else if (!isClockwise)
                 _rotationCount--;
             else
                 _rotationCount++;
 
-            var rotationsLen = Tetromino.Rotations.Length;
-            var rotationPieces = Tetromino.Rotations[_rotationCount % rotationsLen].Pieces;
+            var rotationsLen = _tetromino.Rotations.Length;
+            var rotationPieces = _tetromino.Rotations[_rotationCount % rotationsLen].Pieces;
 
             for (int i = 0; i < rotationPieces.Length; i++)
             {
@@ -105,11 +102,11 @@ namespace Assets.Scripts.Board
 
             }
 
-            Tetromino.Pieces = Tetromino.Rotations[_rotationCount % rotationsLen].Pieces;
-            Vector3 pos = Tetromino.transform.position;
+            _tetromino.Pieces = _tetromino.Rotations[_rotationCount % rotationsLen].Pieces;
+            Vector3 pos = _tetromino.transform.position;
             Vector3 tetrominoCoord = new Vector3(pos.x - 0.5f, pos.y - 0.5f, pos.z); 
             SetTetrominoCoords(tetrominoCoord);
-            Tetromino.RearrangePieces();
+            _tetromino.RearrangePieces();
         }
 
         public void Move(Vector2 direction)
@@ -125,8 +122,8 @@ namespace Assets.Scripts.Board
 
         private void Movement(Vector2 direction)
         {
-            if (Tetromino == null) return;
-            var boardPos = Tetromino.transform.position;
+            if (_tetromino == null) return;
+            var boardPos = _tetromino.transform.position;
 
             foreach (var coord in _tetrominoCoords)
             {
@@ -159,7 +156,7 @@ namespace Assets.Scripts.Board
                 _tetrominoCoords[i].y += direction.y;
             }
 
-            Tetromino.transform.position = new Vector3(boardPos.x + direction.x, boardPos.y + direction.y, boardPos.z);
+            _tetromino.transform.position = new Vector3(boardPos.x + direction.x, boardPos.y + direction.y, boardPos.z);
 
             if (_isRush)
                 Movement(new Vector2(0, -1));
@@ -170,7 +167,7 @@ namespace Assets.Scripts.Board
             BlockTetrominoCells();
             FindAndMoveBlockedRows();
             ResetSpawnedBlocks();
-            Destroy(Tetromino.gameObject);
+            Destroy(_tetromino.gameObject);
 
             // Check upper row reached
             if (CheckUpperRowReached())
@@ -217,7 +214,7 @@ namespace Assets.Scripts.Board
                     if (_boardCells[x, y] == 1 && blockedCell == null)
                     {
                         GameObject spawned = SpawnBlockedCell();
-                        spawned.GetComponent<SpriteRenderer>().sprite = Tetromino.Sprite;
+                        spawned.GetComponent<SpriteRenderer>().sprite = _tetromino.Sprite;
                         BlockedCell blocked = spawned.GetComponent<BlockedCell>();
                         blocked.Piece.XPos = x;
                         blocked.Piece.YPos = y;
@@ -362,14 +359,14 @@ namespace Assets.Scripts.Board
 
         private void SetTetrominoCoords(Vector3 tetrominoCenter)
         {
-            if (Tetromino == null) return;
+            if (_tetromino == null) return;
 
             _tetrominoCoords = new Vector2[4]
             {
-                new Vector2(Tetromino.Pieces[0].XPos + tetrominoCenter.x, Tetromino.Pieces[0].YPos + tetrominoCenter.y),
-                new Vector2(Tetromino.Pieces[1].XPos + tetrominoCenter.x, Tetromino.Pieces[1].YPos + tetrominoCenter.y),
-                new Vector2(Tetromino.Pieces[2].XPos + tetrominoCenter.x, Tetromino.Pieces[2].YPos + tetrominoCenter.y),
-                new Vector2(Tetromino.Pieces[3].XPos + tetrominoCenter.x, Tetromino.Pieces[3].YPos + tetrominoCenter.y)
+                new Vector2(_tetromino.Pieces[0].XPos + tetrominoCenter.x, _tetromino.Pieces[0].YPos + tetrominoCenter.y),
+                new Vector2(_tetromino.Pieces[1].XPos + tetrominoCenter.x, _tetromino.Pieces[1].YPos + tetrominoCenter.y),
+                new Vector2(_tetromino.Pieces[2].XPos + tetrominoCenter.x, _tetromino.Pieces[2].YPos + tetrominoCenter.y),
+                new Vector2(_tetromino.Pieces[3].XPos + tetrominoCenter.x, _tetromino.Pieces[3].YPos + tetrominoCenter.y)
             };
 
             SetTetrominoPosition(tetrominoCenter);
@@ -377,9 +374,9 @@ namespace Assets.Scripts.Board
 
         private void SetTetrominoPosition(Vector3 center)
         {
-            Tetromino.transform.position = new Vector3(
-                Tetromino.Pieces[0].XPos + center.x + 0.5f,
-                Tetromino.Pieces[0].YPos + center.y + 0.5f,
+            _tetromino.transform.position = new Vector3(
+                _tetromino.Pieces[0].XPos + center.x + 0.5f,
+                _tetromino.Pieces[0].YPos + center.y + 0.5f,
                 center.z
             );
         }

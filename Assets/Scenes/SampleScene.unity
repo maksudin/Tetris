@@ -431,7 +431,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_LocalRotation: {x: -0.12861814, y: -0, z: -0, w: 0.9916943}
-  m_LocalPosition: {x: 5, y: 3.3, z: -22.7}
+  m_LocalPosition: {x: 5, y: 3, z: -26.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -991,8 +991,8 @@ MonoBehaviour:
   _blockedCellPrefab: {fileID: 632761194083501790, guid: a37182118a7d4bb4f9a821f539c38637, type: 3}
   _boardSize: {x: 10, y: 20}
   _spawnPivot: {fileID: 164929157}
-  _fallSpeed: 0.403
-  FallEnabled: 0
+  _fallSpeed: 0.315
+  FallEnabled: 1
 --- !u!114 &1864185038
 MonoBehaviour:
   m_ObjectHideFlags: 0
