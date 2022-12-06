@@ -19,7 +19,13 @@ namespace Assets.Scripts.Board
         public void OnRotation(InputAction.CallbackContext context)
         {
             if (context.performed)
-                _board.RotateClockwise();
+                _board.RotateTetromino();
+        }
+
+        public void OnCounterRotation(InputAction.CallbackContext context)
+        {
+            if (context.performed)
+                _board.RotateTetromino(isClockwise: false);
         }
 
         public void OnRush(InputAction.CallbackContext context)

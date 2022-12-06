@@ -5,12 +5,14 @@ namespace Assets.Scripts.Board
 {
     public class Board : MonoBehaviour
     {
-        private GameObject _tetrominoPrefab;
         [SerializeField] private GameObject _blockedCellPrefab;
         [SerializeField] private Vector2 _boardSize = new Vector2(10, 20);
+        [SerializeField] private Transform _spawnPivot;
+
+        private GameObject _tetrominoPrefab;
 
         private Tetromino Tetromino;
-        private Vector2[] _TetrominoCoords;
+        private Vector2[] _tetrominoCoords;
         private Vector3 _tetrominoCenter;
 
         private Vector2 _direction;
@@ -21,16 +23,21 @@ namespace Assets.Scripts.Board
 
         private BlockedCell[] _blockedCells;
         private TGMRandomizer _tGMRandomizer;
+        private NextTetrominoDisplay _nextTetrominoDisplay;
 
         private void Start()
         {
             _boardCells = new int[(int)_boardSize.x, (int)_boardSize.y];
             _tGMRandomizer = GetComponent<TGMRandomizer>();
             _tetrominoPrefab = _tGMRandomizer.GetRandomizedPrefab(isFirstTetromino: true);
+
+            _nextTetrominoDisplay = FindObjectOfType<NextTetrominoDisplay>();
+
+            UpdateNextTetrominoDisplay();
             SpawnTetromino();
 
             _tetrominoCenter = new Vector3(1, 18, 0);
-            SetTetrominoCoords(_tetrominoCenter);
+            SetTetrominoCoords(_spawnPivot.position);
         }
 
         private float _nextFallTime = 0.0f;
@@ -60,7 +67,7 @@ namespace Assets.Scripts.Board
 
         private void SpawnTetromino()
         {
-            var spawned = SpawnUtills.Spawn(_tetrominoPrefab, Vector3.zero);
+            var spawned = SpawnUtills.Spawn(_tetrominoPrefab, _spawnPivot.position);
             Tetromino = spawned.GetComponent<Tetromino>();
         }
 
@@ -70,15 +77,22 @@ namespace Assets.Scripts.Board
             Movement(new Vector2(0, -1));
         }
 
-        public void RotateClockwise()
+        public void RotateTetromino(bool isClockwise = true)
         {
+            if (_rotationCount == 0 && isClockwise == false)
+                _rotationCount = Tetromino.Rotations.Length - 1;
+            else if (!isClockwise)
+                _rotationCount--;
+            else
+                _rotationCount++;
+
             var rotationsLen = Tetromino.Rotations.Length;
             var rotationPieces = Tetromino.Rotations[_rotationCount % rotationsLen].Pieces;
 
             for (int i = 0; i < rotationPieces.Length; i++)
             {
-                var X = rotationPieces[i].XPos + _TetrominoCoords[0].x;
-                var Y = rotationPieces[i].YPos + _TetrominoCoords[0].y;
+                var X = rotationPieces[i].XPos + _tetrominoCoords[0].x;
+                var Y = rotationPieces[i].YPos + _tetrominoCoords[0].y;
 
                 if (IsCellOutOfBounds(coordX: X))
                     return;
@@ -96,14 +110,13 @@ namespace Assets.Scripts.Board
             Vector3 tetrominoCoord = new Vector3(pos.x - 0.5f, pos.y - 0.5f, pos.z); 
             SetTetrominoCoords(tetrominoCoord);
             Tetromino.RearrangePieces();
-
-            _rotationCount++;
         }
 
         public void Move(Vector2 direction)
         {
             if (_isRush) return;
             _direction = direction;
+
             if (FallEnabled) 
                 Movement(new Vector2(_direction.x, 0));
             else
@@ -115,7 +128,7 @@ namespace Assets.Scripts.Board
             if (Tetromino == null) return;
             var boardPos = Tetromino.transform.position;
 
-            foreach (var coord in _TetrominoCoords)
+            foreach (var coord in _tetrominoCoords)
             {
                 var X = coord.x + direction.x;
                 var Y = coord.y + direction.y;
@@ -140,10 +153,10 @@ namespace Assets.Scripts.Board
                     return;
             }
 
-            for (int i = 0; i < _TetrominoCoords.Length; i++)
+            for (int i = 0; i < _tetrominoCoords.Length; i++)
             {
-                _TetrominoCoords[i].x += direction.x;
-                _TetrominoCoords[i].y += direction.y;
+                _tetrominoCoords[i].x += direction.x;
+                _tetrominoCoords[i].y += direction.y;
             }
 
             Tetromino.transform.position = new Vector3(boardPos.x + direction.x, boardPos.y + direction.y, boardPos.z);
@@ -168,13 +181,22 @@ namespace Assets.Scripts.Board
                 return;
             }
 
+            _tetrominoPrefab = _nextTetrominoDisplay.Prefab;
 
-            _tetrominoPrefab = _tGMRandomizer.GetRandomizedPrefab(isFirstTetromino: false);
+            UpdateNextTetrominoDisplay();
             SpawnTetromino();
-            SetTetrominoCoords(_tetrominoCenter);
+            SetTetrominoCoords(_spawnPivot.position);
             _rotationCount = 0;
             _isRush = false;
         }
+
+
+        private void UpdateNextTetrominoDisplay()
+        {
+            var nextPrefab = _tGMRandomizer.GetRandomizedPrefab();
+            _nextTetrominoDisplay.SetNextTetromino(nextPrefab);
+        }
+
 
         private bool CheckUpperRowReached()
         {
@@ -218,7 +240,7 @@ namespace Assets.Scripts.Board
 
         private void BlockTetrominoCells()
         {
-            foreach (var cell in _TetrominoCoords)
+            foreach (var cell in _tetrominoCoords)
                 _boardCells[(int)cell.x, (int)cell.y] = 1;
         }
 
@@ -308,6 +330,7 @@ namespace Assets.Scripts.Board
                 }
             );
 
+
             Gizmos.color = Color.white;
 
 
@@ -341,7 +364,7 @@ namespace Assets.Scripts.Board
         {
             if (Tetromino == null) return;
 
-            _TetrominoCoords = new Vector2[4]
+            _tetrominoCoords = new Vector2[4]
             {
                 new Vector2(Tetromino.Pieces[0].XPos + tetrominoCenter.x, Tetromino.Pieces[0].YPos + tetrominoCenter.y),
                 new Vector2(Tetromino.Pieces[1].XPos + tetrominoCenter.x, Tetromino.Pieces[1].YPos + tetrominoCenter.y),

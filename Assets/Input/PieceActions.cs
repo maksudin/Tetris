@@ -53,6 +53,15 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Counter Rotation"",
+                    ""type"": ""Button"",
+                    ""id"": ""7323e27d-0158-4ead-875e-6ce196a2b3da"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -132,6 +141,17 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
                     ""action"": ""Rush"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a24c7dcb-6659-4371-838a-210b05385432"",
+                    ""path"": ""<Keyboard>/t"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Counter Rotation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -143,6 +163,7 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
         m_PieceMap_HorizontalMovement = m_PieceMap.FindAction("Horizontal Movement", throwIfNotFound: true);
         m_PieceMap_Rotation = m_PieceMap.FindAction("Rotation", throwIfNotFound: true);
         m_PieceMap_Rush = m_PieceMap.FindAction("Rush", throwIfNotFound: true);
+        m_PieceMap_CounterRotation = m_PieceMap.FindAction("Counter Rotation", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -205,6 +226,7 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
     private readonly InputAction m_PieceMap_HorizontalMovement;
     private readonly InputAction m_PieceMap_Rotation;
     private readonly InputAction m_PieceMap_Rush;
+    private readonly InputAction m_PieceMap_CounterRotation;
     public struct PieceMapActions
     {
         private @PieceActions m_Wrapper;
@@ -212,6 +234,7 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
         public InputAction @HorizontalMovement => m_Wrapper.m_PieceMap_HorizontalMovement;
         public InputAction @Rotation => m_Wrapper.m_PieceMap_Rotation;
         public InputAction @Rush => m_Wrapper.m_PieceMap_Rush;
+        public InputAction @CounterRotation => m_Wrapper.m_PieceMap_CounterRotation;
         public InputActionMap Get() { return m_Wrapper.m_PieceMap; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -230,6 +253,9 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
                 @Rush.started -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnRush;
                 @Rush.performed -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnRush;
                 @Rush.canceled -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnRush;
+                @CounterRotation.started -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnCounterRotation;
+                @CounterRotation.performed -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnCounterRotation;
+                @CounterRotation.canceled -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnCounterRotation;
             }
             m_Wrapper.m_PieceMapActionsCallbackInterface = instance;
             if (instance != null)
@@ -243,6 +269,9 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
                 @Rush.started += instance.OnRush;
                 @Rush.performed += instance.OnRush;
                 @Rush.canceled += instance.OnRush;
+                @CounterRotation.started += instance.OnCounterRotation;
+                @CounterRotation.performed += instance.OnCounterRotation;
+                @CounterRotation.canceled += instance.OnCounterRotation;
             }
         }
     }
@@ -252,5 +281,6 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
         void OnHorizontalMovement(InputAction.CallbackContext context);
         void OnRotation(InputAction.CallbackContext context);
         void OnRush(InputAction.CallbackContext context);
+        void OnCounterRotation(InputAction.CallbackContext context);
     }
 }

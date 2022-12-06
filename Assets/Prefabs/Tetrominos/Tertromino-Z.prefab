@@ -47,19 +47,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cae0d6f18dbd754d99d4339518dcb38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _shape: 5
+  Shape: 5
   Sprite: {fileID: 21300000, guid: 666c1cc3cfae7ba43bdc3fe1047a7ab4, type: 3}
   Rotations:
-  - Show: 0
-    Pieces:
-    - XPos: 0
-      YPos: 0
-    - XPos: 0
-      YPos: -1
-    - XPos: 1
-      YPos: 0
-    - XPos: 1
-      YPos: 1
   - Show: 0
     Pieces:
     - XPos: 0
@@ -70,6 +60,16 @@ MonoBehaviour:
       YPos: 1
     - XPos: 1
       YPos: 0
+  - Show: 0
+    Pieces:
+    - XPos: 0
+      YPos: 0
+    - XPos: 0
+      YPos: -1
+    - XPos: 1
+      YPos: 0
+    - XPos: 1
+      YPos: 1
   Pieces:
   - XPos: 0
     YPos: 0
