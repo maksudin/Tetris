@@ -187,6 +187,15 @@ namespace Assets.Scripts.Board
             _isRush = false;
         }
 
+        private void RemoveAllBlockedCells()
+        {
+            for (int x = 0; x < _boardSize.x; x++)
+                for (int y = 0; y < _boardSize.y; y++)
+                    _boardCells[x, y] = 0;
+
+            ResetSpawnedBlocks();
+        }
+
 
         private void UpdateNextTetrominoDisplay()
         {
