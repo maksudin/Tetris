@@ -28,10 +28,16 @@ namespace Assets.Scripts.Board
                 _board.RotateTetromino(isClockwise: false);
         }
 
-        public void OnRush(InputAction.CallbackContext context)
+        public void OnHardDrop(InputAction.CallbackContext context)
         {
             if (context.performed)
-                _board.Rush();
+                _board.HardDrop();
+        }
+
+        public void OnRestart(InputAction.CallbackContext context)
+        {
+            if (context.performed)
+                _board.Restart();
         }
     }
 }

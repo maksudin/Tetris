@@ -1,5 +1,6 @@
 using Assets.Scripts.Utils;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Assets.Scripts.Board
 {
@@ -8,6 +9,14 @@ namespace Assets.Scripts.Board
         [SerializeField] private GameObject _blockedCellPrefab;
         [SerializeField] private Vector2 _boardSize = new Vector2(10, 20);
         [SerializeField] private Transform _spawnPivot;
+
+        [Range(0, 1)]
+        [SerializeField] private float _fallSpeed = 0.1f;
+        [SerializeField] private bool FallEnabled;
+        private float _nextFallTime = 0.0f;
+
+        [SerializeField] public UnityEvent OnGameOver;
+        [SerializeField] public UnityEvent OnRestart;
 
         private GameObject _tetrominoPrefab;
 
@@ -18,7 +27,7 @@ namespace Assets.Scripts.Board
         private int[,] _boardCells;
         private int _rotationCount;
 
-        private bool _isRush;
+        private bool _isHardDrop;
 
         private BlockedCell[] _blockedCells;
         private TGMRandomizer _tGMRandomizer;
@@ -36,11 +45,6 @@ namespace Assets.Scripts.Board
             SpawnTetromino();
             SetTetrominoCoords(_spawnPivot.position);
         }
-
-        private float _nextFallTime = 0.0f;
-        [Range(0, 1)]
-        [SerializeField] private float _fallSpeed = 0.1f;
-        [SerializeField] private bool FallEnabled;
 
         private void Update()
         {
@@ -68,9 +72,9 @@ namespace Assets.Scripts.Board
             _tetromino = spawned.GetComponent<Tetromino>();
         }
 
-        public void Rush()
+        public void HardDrop()
         {
-            _isRush = true;
+            _isHardDrop = true;
             Movement(new Vector2(0, -1));
         }
 
@@ -111,7 +115,7 @@ namespace Assets.Scripts.Board
 
         public void Move(Vector2 direction)
         {
-            if (_isRush) return;
+            if (_isHardDrop) return;
             _direction = direction;
 
             if (FallEnabled) 
@@ -158,7 +162,7 @@ namespace Assets.Scripts.Board
 
             _tetromino.transform.position = new Vector3(boardPos.x + direction.x, boardPos.y + direction.y, boardPos.z);
 
-            if (_isRush)
+            if (_isHardDrop)
                 Movement(new Vector2(0, -1));
         }
 
@@ -169,12 +173,13 @@ namespace Assets.Scripts.Board
             ResetSpawnedBlocks();
             Destroy(_tetromino.gameObject);
 
-            // Check upper row reached
+            _rotationCount = 0;
+            _isHardDrop = false;
+
             if (CheckUpperRowReached())
             {
-                _rotationCount = 0;
-                _isRush = false;
                 // Thats the end of the game
+                OnGameOver?.Invoke();
                 return;
             }
 
@@ -183,8 +188,24 @@ namespace Assets.Scripts.Board
             UpdateNextTetrominoDisplay();
             SpawnTetromino();
             SetTetrominoCoords(_spawnPivot.position);
-            _rotationCount = 0;
-            _isRush = false;
+        }
+
+        public void Restart()
+        {
+            RemoveAllBlockedCells();
+            _isHardDrop = false;
+
+            _tGMRandomizer.ResetHistory();
+            if (_tetromino != null) 
+                Destroy(_tetromino.gameObject);
+
+            _tetrominoPrefab = _tGMRandomizer.GetRandomizedPrefab(isFirstTetromino: true);
+
+            UpdateNextTetrominoDisplay();
+            SpawnTetromino();
+            SetTetrominoCoords(_spawnPivot.position);
+
+            OnRestart?.Invoke();
         }
 
         private void RemoveAllBlockedCells()
@@ -195,7 +216,6 @@ namespace Assets.Scripts.Board
 
             ResetSpawnedBlocks();
         }
-
 
         private void UpdateNextTetrominoDisplay()
         {

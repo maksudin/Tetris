@@ -46,7 +46,16 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Rush"",
+                    ""name"": ""Counter Rotation"",
+                    ""type"": ""Button"",
+                    ""id"": ""7323e27d-0158-4ead-875e-6ce196a2b3da"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Hard Drop"",
                     ""type"": ""Button"",
                     ""id"": ""4d44232c-486f-421d-afd4-fcef73775793"",
                     ""expectedControlType"": ""Button"",
@@ -55,9 +64,9 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Counter Rotation"",
+                    ""name"": ""Restart"",
                     ""type"": ""Button"",
-                    ""id"": ""7323e27d-0158-4ead-875e-6ce196a2b3da"",
+                    ""id"": ""4988a3a3-29fc-4b77-b1ff-c3fe1fc9e202"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -123,7 +132,18 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""b968d6cd-ad38-4392-b6d9-f1d7b40c116b"",
-                    ""path"": ""<Keyboard>/r"",
+                    ""path"": ""<Keyboard>/upArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Rotation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2b60037a-5d24-4011-b9ff-e9efdf0004c6"",
+                    ""path"": ""<Keyboard>/x"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -138,14 +158,36 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Rush"",
+                    ""action"": ""Hard Drop"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""656cecf8-b0bc-4539-8c73-f9a10aeccf6d"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Restart"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
                     ""id"": ""a24c7dcb-6659-4371-838a-210b05385432"",
-                    ""path"": ""<Keyboard>/t"",
+                    ""path"": ""<Keyboard>/z"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Counter Rotation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d630a9d1-c291-4d0e-97d2-813fa00b786d"",
+                    ""path"": ""<Keyboard>/ctrl"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -162,8 +204,9 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
         m_PieceMap = asset.FindActionMap("PieceMap", throwIfNotFound: true);
         m_PieceMap_HorizontalMovement = m_PieceMap.FindAction("Horizontal Movement", throwIfNotFound: true);
         m_PieceMap_Rotation = m_PieceMap.FindAction("Rotation", throwIfNotFound: true);
-        m_PieceMap_Rush = m_PieceMap.FindAction("Rush", throwIfNotFound: true);
         m_PieceMap_CounterRotation = m_PieceMap.FindAction("Counter Rotation", throwIfNotFound: true);
+        m_PieceMap_HardDrop = m_PieceMap.FindAction("Hard Drop", throwIfNotFound: true);
+        m_PieceMap_Restart = m_PieceMap.FindAction("Restart", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -225,16 +268,18 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
     private IPieceMapActions m_PieceMapActionsCallbackInterface;
     private readonly InputAction m_PieceMap_HorizontalMovement;
     private readonly InputAction m_PieceMap_Rotation;
-    private readonly InputAction m_PieceMap_Rush;
     private readonly InputAction m_PieceMap_CounterRotation;
+    private readonly InputAction m_PieceMap_HardDrop;
+    private readonly InputAction m_PieceMap_Restart;
     public struct PieceMapActions
     {
         private @PieceActions m_Wrapper;
         public PieceMapActions(@PieceActions wrapper) { m_Wrapper = wrapper; }
         public InputAction @HorizontalMovement => m_Wrapper.m_PieceMap_HorizontalMovement;
         public InputAction @Rotation => m_Wrapper.m_PieceMap_Rotation;
-        public InputAction @Rush => m_Wrapper.m_PieceMap_Rush;
         public InputAction @CounterRotation => m_Wrapper.m_PieceMap_CounterRotation;
+        public InputAction @HardDrop => m_Wrapper.m_PieceMap_HardDrop;
+        public InputAction @Restart => m_Wrapper.m_PieceMap_Restart;
         public InputActionMap Get() { return m_Wrapper.m_PieceMap; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -250,12 +295,15 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
                 @Rotation.started -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnRotation;
                 @Rotation.performed -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnRotation;
                 @Rotation.canceled -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnRotation;
-                @Rush.started -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnRush;
-                @Rush.performed -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnRush;
-                @Rush.canceled -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnRush;
                 @CounterRotation.started -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnCounterRotation;
                 @CounterRotation.performed -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnCounterRotation;
                 @CounterRotation.canceled -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnCounterRotation;
+                @HardDrop.started -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnHardDrop;
+                @HardDrop.performed -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnHardDrop;
+                @HardDrop.canceled -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnHardDrop;
+                @Restart.started -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnRestart;
+                @Restart.performed -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnRestart;
+                @Restart.canceled -= m_Wrapper.m_PieceMapActionsCallbackInterface.OnRestart;
             }
             m_Wrapper.m_PieceMapActionsCallbackInterface = instance;
             if (instance != null)
@@ -266,12 +314,15 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
                 @Rotation.started += instance.OnRotation;
                 @Rotation.performed += instance.OnRotation;
                 @Rotation.canceled += instance.OnRotation;
-                @Rush.started += instance.OnRush;
-                @Rush.performed += instance.OnRush;
-                @Rush.canceled += instance.OnRush;
                 @CounterRotation.started += instance.OnCounterRotation;
                 @CounterRotation.performed += instance.OnCounterRotation;
                 @CounterRotation.canceled += instance.OnCounterRotation;
+                @HardDrop.started += instance.OnHardDrop;
+                @HardDrop.performed += instance.OnHardDrop;
+                @HardDrop.canceled += instance.OnHardDrop;
+                @Restart.started += instance.OnRestart;
+                @Restart.performed += instance.OnRestart;
+                @Restart.canceled += instance.OnRestart;
             }
         }
     }
@@ -280,7 +331,8 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
     {
         void OnHorizontalMovement(InputAction.CallbackContext context);
         void OnRotation(InputAction.CallbackContext context);
-        void OnRush(InputAction.CallbackContext context);
         void OnCounterRotation(InputAction.CallbackContext context);
+        void OnHardDrop(InputAction.CallbackContext context);
+        void OnRestart(InputAction.CallbackContext context);
     }
 }

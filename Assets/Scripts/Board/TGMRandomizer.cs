@@ -10,6 +10,11 @@ namespace Assets.Scripts.Board
 
         private void Awake()
         {
+            ResetHistory();
+        }
+
+        public void ResetHistory()
+        {
             _shapesHistory = new Shape[4]
             {
                 Shape.Z, Shape.Z, Shape.Z, Shape.Z // TGM1
