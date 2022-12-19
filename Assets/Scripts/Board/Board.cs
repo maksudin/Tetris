@@ -1,3 +1,4 @@
+using Assets.Scripts.Model;
 using Assets.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.Events;
@@ -34,10 +35,35 @@ namespace Assets.Scripts.Board
         private TGMRandomizer _tGMRandomizer;
         private NextTetrominoDisplay _nextTetrominoDisplay;
 
+        private GameSession _gameSession;
+        private Score _score;
+
         private void Start()
         {
             _boardCells = new int[(int)_boardSize.x, (int)_boardSize.y];
             _tGMRandomizer = GetComponent<TGMRandomizer>();
+            _gameSession = FindObjectOfType<GameSession>();
+            _score = FindObjectOfType<Score>();
+            _gameSession.OnLevelUp += ChangeSpeed;
+
+            SetDefaultSpeed();
+        }
+
+        private void OnDestroy()
+        {
+            _gameSession.OnLevelUp -= ChangeSpeed;
+        }
+
+        private void ChangeSpeed()
+        {
+            var defSpeed = DefsFacade.I.LevelDef.GetLevelInfo(_gameSession.CurrentLevel).Speed;
+            _fallSpeed = defSpeed;
+        }
+
+        private void SetDefaultSpeed()
+        {
+            var defSpeed = DefsFacade.I.LevelDef.GetLevelInfo(1).Speed;
+            _fallSpeed = defSpeed;
         }
 
         private void Update()
@@ -278,8 +304,11 @@ namespace Assets.Scripts.Board
                 _boardCells[(int)cell.x, (int)cell.y] = 1;
         }
 
+
+
         private void FindAndMoveBlockedRows()
         {
+            int linesCleared = 0;
             for (int y = 0; y < _boardSize.y - 1; y++)
             {
                 bool upperEdge = y == _boardSize.y - 1;
@@ -287,6 +316,7 @@ namespace Assets.Scripts.Board
                 if (isRowBlocked && !upperEdge)
                 {
                     RemoveBlockedRow(y);
+                    linesCleared++;
                     for (int i = y; i < _boardSize.y - 1; i++)
                         MoveRowTo(fromIndex: i + 1, toIndex: i);
 
@@ -294,9 +324,17 @@ namespace Assets.Scripts.Board
                 }
 
                 else if (isRowBlocked)
+                {
+                    linesCleared++;
                     RemoveBlockedRow(y);
+                }
             }
+
+            if (linesCleared > 0)
+                _score.AddScorePointsForLines(linesCleared, _gameSession.CurrentLevel);
         }
+
+
 
         private void MoveRowTo(int fromIndex, int toIndex)
         {

@@ -6,23 +6,15 @@ namespace Assets.Scripts
 {
     public class Score : MonoBehaviour
     {
-        [SerializeField] private int _value;
+        private int _value;
         public int Value => _value;
 
         public event Action OnScoreChange;
 
-        private GameSession _gameSession;
-
-        private void Awake()
+        public void AddScorePointsForLines(int lines, int level)
         {
-            _gameSession = FindObjectOfType<GameSession>();   
-        }
-
-        public void GetPointsForLines(int lines)
-        {
-            _value += DefsFacade.I.LevelDef.GetPointsDefValueForLines(lines);
+            _value += DefsFacade.I.LevelDef.GetPointsDefValueForLines(lines, level);
             OnScoreChange?.Invoke();
         }
-
     }
 }

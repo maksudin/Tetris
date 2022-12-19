@@ -15,29 +15,48 @@ namespace Assets.Scripts.Model.Level
 
         public int MaximumLevel => LevelInfos.Last().LevelValue;
 
-        public int GetPointsDefValueForLines(int lines)
+        public LevelInfo GetLevelInfo(int level)
         {
+            foreach (var levelInfo in _levelInfos)
+                if (levelInfo.LevelValue == level)
+                    return levelInfo;
+
+            return default;
+        }
+
+        public int GetPointsDefValueForLines(int lines, int level)
+        {
+            int points = 0;
             switch (lines)
             {
                 case 1:
-                    return _points.OneLine;
+                    points =  _points.OneLine;
+                    break;
                 case 2:
-                    return _points.TwoLine;
+                    points = _points.TwoLine;
+                    break;
                 case 3:
-                    return _points.ThreeLine;
+                    points = _points.ThreeLine;
+                    break;
                 case 4:
-                    return _points.FourLine;
-                default:
-                    return -1;
+                    points = _points.FourLine;
+                    break;
             }
+
+            return points * (level + 1);
         }
     }
 
     [Serializable]
     public struct LevelInfo
     {
-        [SerializeField] private int levelValue;
-        public int LevelValue => levelValue;
+        [SerializeField] private int _levelValue;
+        [SerializeField] private int _scoreForNextLevel;
+        [SerializeField] private float _speed;
+
+        public int LevelValue => _levelValue;
+        public int ScoreForNextLevel => _scoreForNextLevel;
+        public float Speed => _speed;
     }
 
     [Serializable]
