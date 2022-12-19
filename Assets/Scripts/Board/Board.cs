@@ -12,6 +12,7 @@ namespace Assets.Scripts.Board
 
         [Range(0, 1)]
         [SerializeField] private float _fallSpeed = 0.1f;
+        [SerializeField] private float _softDropMultiplier = 1f;
         [SerializeField] private bool FallEnabled;
         private float _nextFallTime = 0.0f;
 
@@ -37,23 +38,31 @@ namespace Assets.Scripts.Board
         {
             _boardCells = new int[(int)_boardSize.x, (int)_boardSize.y];
             _tGMRandomizer = GetComponent<TGMRandomizer>();
-            _tetrominoPrefab = _tGMRandomizer.GetRandomizedPrefab(isFirstTetromino: true);
+        }
 
+        private void Update()
+        {
+            if (!FallEnabled && _tetrominoPrefab == null) return;
+            if (Time.time > _nextFallTime)
+            {
+                _nextFallTime += _fallSpeed * _softDropMultiplier;
+                Movement(new Vector2(0, -1));
+            }
+        }
+
+        public void EnableControls()
+        {
+            ControlsUtils.EnableInput();
+        }
+
+        public void StartGame()
+        {
+            _tetrominoPrefab = _tGMRandomizer.GetRandomizedPrefab(isFirstTetromino: true);
             _nextTetrominoDisplay = FindObjectOfType<NextTetrominoDisplay>();
 
             UpdateNextTetrominoDisplay();
             SpawnTetromino();
             SetTetrominoCoords(_spawnPivot.position);
-        }
-
-        private void Update()
-        {
-            if (!FallEnabled) return;
-            if (Time.time > _nextFallTime)
-            {
-                _nextFallTime += _fallSpeed;
-                Movement(new Vector2(0, -1));
-            }
         }
 
         private void FindBlockedCellObjects()
@@ -178,7 +187,6 @@ namespace Assets.Scripts.Board
 
             if (CheckUpperRowReached())
             {
-                // Thats the end of the game
                 OnGameOver?.Invoke();
                 return;
             }

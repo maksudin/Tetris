@@ -4,6 +4,7 @@
 *.bin
 *.apk
 /Library/
+/build
 /Temp/
 /Assets/VSCode*
 /obj/

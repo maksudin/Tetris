@@ -1,3 +1,4 @@
+using Assets.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -6,6 +7,11 @@ namespace Assets.Scripts.Board
     public class BoardInputReader : MonoBehaviour
     {
         [SerializeField] private Board _board;
+
+        private void Awake()
+        {
+            ControlsUtils.DisableInput();
+        }
 
         public void OnMovement(InputAction.CallbackContext context)
         {
