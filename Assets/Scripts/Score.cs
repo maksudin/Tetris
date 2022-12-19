@@ -16,5 +16,11 @@ namespace Assets.Scripts
             _value += DefsFacade.I.LevelDef.GetPointsDefValueForLines(lines, level);
             OnScoreChange?.Invoke();
         }
+
+        public void ResetScore()
+        {
+            _value = 0;
+            OnScoreChange?.Invoke();
+        }
     }
 }

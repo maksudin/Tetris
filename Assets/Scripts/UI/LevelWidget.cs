@@ -11,7 +11,7 @@ namespace Assets.Scripts.UI
         private void Start()
         {
             _gameSession = FindObjectOfType<GameSession>();
-            _gameSession.OnLevelUp += UpdateLevel;
+            _gameSession.OnLevelChange += UpdateLevel;
         }
 
         private void UpdateLevel()
@@ -21,7 +21,7 @@ namespace Assets.Scripts.UI
 
         private void OnDestroy()
         {
-            _gameSession.OnLevelUp -= UpdateLevel;
+            _gameSession.OnLevelChange -= UpdateLevel;
         }
     }
 }

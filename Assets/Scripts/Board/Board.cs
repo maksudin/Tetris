@@ -44,14 +44,14 @@ namespace Assets.Scripts.Board
             _tGMRandomizer = GetComponent<TGMRandomizer>();
             _gameSession = FindObjectOfType<GameSession>();
             _score = FindObjectOfType<Score>();
-            _gameSession.OnLevelUp += ChangeSpeed;
+            _gameSession.OnLevelChange += ChangeSpeed;
 
             SetDefaultSpeed();
         }
 
         private void OnDestroy()
         {
-            _gameSession.OnLevelUp -= ChangeSpeed;
+            _gameSession.OnLevelChange -= ChangeSpeed;
         }
 
         private void ChangeSpeed()

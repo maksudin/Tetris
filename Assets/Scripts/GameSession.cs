@@ -9,7 +9,7 @@ namespace Assets.Scripts
         [SerializeField] public Score Score;
         public int CurrentLevel;
         private int maxLevel;
-        public event Action OnLevelUp;
+        public event Action OnLevelChange;
 
         private void Awake()
         {
@@ -20,12 +20,18 @@ namespace Assets.Scripts
         {
             CurrentLevel = DefsFacade.I.LevelDef.GetLevelInfo(0).LevelValue;
             Score.OnScoreChange += CheckLevelThreshold;
-            OnLevelUp?.Invoke();
+            OnLevelChange?.Invoke();
         }
 
         private void OnDestroy()
         {
             Score.OnScoreChange -= CheckLevelThreshold;
+        }
+
+        public void ResetLevel()
+        {
+            CurrentLevel = DefsFacade.I.LevelDef.GetLevelInfo(0).LevelValue;
+            OnLevelChange?.Invoke();
         }
 
         private void CheckLevelThreshold()
@@ -41,17 +47,7 @@ namespace Assets.Scripts
                 return;
 
             CurrentLevel++;
-            OnLevelUp?.Invoke();
+            OnLevelChange?.Invoke();
         }
-
-        //private GameSession GetExistsSession()
-        //{
-        //    var sessions = FindObjectsOfType<GameSession>();
-        //    foreach (var gameSession in sessions)
-        //        if (gameSession != this)
-        //            return gameSession;
-
-        //    return null;
-        //}
     }
 }
