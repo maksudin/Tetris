@@ -4,6 +4,7 @@ namespace Assets.Scripts.Board
 {
     public class TGMRandomizer : MonoBehaviour
     {
+        [SerializeField] private bool _debug;
         [SerializeField] private GameObject[] _tetrominoPrefabs;
         [SerializeField] private int _tries = 4;
         [SerializeField] private Shape[] _shapesHistory;
@@ -27,6 +28,12 @@ namespace Assets.Scripts.Board
             int randomValue;
             GameObject tetrominoPrefab = null;
             Shape nextShape = Shape.I;
+            if (_debug)
+            {
+                tetrominoPrefab = _tetrominoPrefabs[0];
+                return tetrominoPrefab;
+            }
+                
 
             for (int countTries = 0; countTries < _tries; countTries++)
             {

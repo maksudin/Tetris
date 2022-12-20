@@ -62,13 +62,13 @@ namespace Assets.Scripts.Board
 
         private void SetDefaultSpeed()
         {
-            var defSpeed = DefsFacade.I.LevelDef.GetLevelInfo(1).Speed;
+            var defSpeed = DefsFacade.I.LevelDef.GetLevelInfo(0).Speed;
             _fallSpeed = defSpeed;
         }
 
         private void Update()
         {
-            if (!FallEnabled && _tetrominoPrefab == null) return;
+            if (!FallEnabled || _tetrominoPrefab == null) return;
             if (Time.time > _nextFallTime)
             {
                 _nextFallTime += _fallSpeed * _softDropMultiplier;
@@ -201,15 +201,21 @@ namespace Assets.Scripts.Board
                 Movement(new Vector2(0, -1));
         }
 
+        private int _linesCleared;
+
         private void CleanUpAndPrepareNextTetromino()
         {
             BlockTetrominoCells();
             FindAndMoveBlockedRows();
+            if (_linesCleared > 0)
+                _score.AddScorePointsForLines(_linesCleared, _gameSession.CurrentLevel);
+
             ResetSpawnedBlocks();
             Destroy(_tetromino.gameObject);
 
             _rotationCount = 0;
             _isHardDrop = false;
+            _linesCleared = 0;
 
             if (CheckUpperRowReached())
             {
@@ -222,6 +228,67 @@ namespace Assets.Scripts.Board
             UpdateNextTetrominoDisplay();
             SpawnTetromino();
             SetTetrominoCoords(_spawnPivot.position);
+        }
+
+        private void FindAndMoveBlockedRows()
+        {
+            for (int y = 0; y < _boardSize.y - 1; y++)
+            {
+                bool upperEdge = y == _boardSize.y - 1;
+                bool isRowBlocked = IsRowBlocked(y);
+                if (isRowBlocked && !upperEdge)
+                {
+                    RemoveBlockedRow(y);
+                    _linesCleared++;
+                    for (int i = y; i < _boardSize.y - 1; i++)
+                        MoveRowTo(fromIndex: i + 1, toIndex: i);
+
+                    FindAndMoveBlockedRows();
+                }
+
+                else if (isRowBlocked)
+                {
+                    _linesCleared++;
+                    RemoveBlockedRow(y);
+                }
+            }
+        }
+
+        private void MoveRowTo(int fromIndex, int toIndex)
+        {
+            int[] row = GetBlockedRow(fromIndex);
+            ReplaceRowWith(replaceIndex: toIndex, row);
+            RemoveBlockedRow(fromIndex);
+        }
+
+        private void ReplaceRowWith(int replaceIndex, int[] rowVals)
+        {
+            for (int x = 0; x < _boardSize.x; x++)
+                _boardCells[x, replaceIndex] = rowVals[x];
+        }
+
+        private int[] GetBlockedRow(int y)
+        {
+            int[] blockedRow = new int[(int)_boardSize.x];
+            for (int x = 0; x < _boardSize.x; x++)
+                blockedRow[x] = _boardCells[x, y];
+            return blockedRow;
+        }
+
+        private bool IsRowBlocked(int y)
+        {
+            int countBlocked = 0;
+            for (int x = 0; x < _boardSize.x; x++)
+                if (_boardCells[x, y] == 1)
+                    countBlocked++;
+
+            return countBlocked == _boardSize.x ? true : false;
+        }
+
+        private void RemoveBlockedRow(int y)
+        {
+            for (int x = 0; x < _boardSize.x; x++)
+                _boardCells[x, y] = 0;
         }
 
         public void Restart()
@@ -304,74 +371,7 @@ namespace Assets.Scripts.Board
                 _boardCells[(int)cell.x, (int)cell.y] = 1;
         }
 
-
-
-        private void FindAndMoveBlockedRows()
-        {
-            int linesCleared = 0;
-            for (int y = 0; y < _boardSize.y - 1; y++)
-            {
-                bool upperEdge = y == _boardSize.y - 1;
-                bool isRowBlocked = IsRowBlocked(y);
-                if (isRowBlocked && !upperEdge)
-                {
-                    RemoveBlockedRow(y);
-                    linesCleared++;
-                    for (int i = y; i < _boardSize.y - 1; i++)
-                        MoveRowTo(fromIndex: i + 1, toIndex: i);
-
-                    FindAndMoveBlockedRows();
-                }
-
-                else if (isRowBlocked)
-                {
-                    linesCleared++;
-                    RemoveBlockedRow(y);
-                }
-            }
-
-            if (linesCleared > 0)
-                _score.AddScorePointsForLines(linesCleared, _gameSession.CurrentLevel);
-        }
-
-
-
-        private void MoveRowTo(int fromIndex, int toIndex)
-        {
-            int[] row = GetBlockedRow(fromIndex);
-            ReplaceRowWith(replaceIndex: toIndex, row);
-            RemoveBlockedRow(fromIndex);
-        }
-
-        private void ReplaceRowWith(int replaceIndex, int[] rowVals)
-        {
-            for (int x = 0; x < _boardSize.x; x++)
-                _boardCells[x, replaceIndex] = rowVals[x];
-        }
-
-        private int[] GetBlockedRow(int y)
-        {
-            int[] blockedRow = new int[(int)_boardSize.x];
-            for (int x = 0; x < _boardSize.x; x++)
-                blockedRow[x] = _boardCells[x, y];
-            return blockedRow;
-        }
-
-        private bool IsRowBlocked(int y)
-        {
-            int countBlocked = 0;
-            for (int x = 0; x < _boardSize.x; x++)
-                if (_boardCells[x, y] == 1)
-                    countBlocked++;
-
-            return countBlocked == _boardSize.x ? true : false;
-        }
-
-        private void RemoveBlockedRow(int y)
-        {
-            for (int x = 0; x < _boardSize.x; x++)
-                _boardCells[x, y] = 0;
-        }
+        
 
         private bool IsCellOutOfBounds(float coordX)
         {
