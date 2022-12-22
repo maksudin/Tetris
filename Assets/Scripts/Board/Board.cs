@@ -68,7 +68,7 @@ namespace Assets.Scripts.Board
 
         private void Update()
         {
-            if (!FallEnabled || _tetrominoPrefab == null) return;
+            if (!FallEnabled && _tetrominoPrefab == null) return;
             if (Time.time > _nextFallTime)
             {
                 _nextFallTime += _fallSpeed * _softDropMultiplier;
