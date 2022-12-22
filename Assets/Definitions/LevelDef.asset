@@ -17,32 +17,32 @@ MonoBehaviour:
     _scoreForNextLevel: 100
     _speed: 0.66
   - _levelValue: 1
-    _scoreForNextLevel: 200
+    _scoreForNextLevel: 500
     _speed: 0.53
   - _levelValue: 2
-    _scoreForNextLevel: 400
+    _scoreForNextLevel: 1100
     _speed: 0.43
   - _levelValue: 3
-    _scoreForNextLevel: 600
+    _scoreForNextLevel: 3000
     _speed: 0.36
   - _levelValue: 4
-    _scoreForNextLevel: 800
+    _scoreForNextLevel: 6500
     _speed: 0.27
   - _levelValue: 5
-    _scoreForNextLevel: 1000
+    _scoreForNextLevel: 10000
     _speed: 0.25
   - _levelValue: 6
-    _scoreForNextLevel: 1200
+    _scoreForNextLevel: 16000
     _speed: 0.23
   - _levelValue: 7
-    _scoreForNextLevel: 1400
+    _scoreForNextLevel: 24000
     _speed: 0.2
   - _levelValue: 8
-    _scoreForNextLevel: 1600
+    _scoreForNextLevel: 48000
     _speed: 0.12
   - _levelValue: 9
-    _scoreForNextLevel: 2000
-    _speed: 0.12
+    _scoreForNextLevel: 60000
+    _speed: 0.1
   _points:
     oneLine: 40
     twoLine: 100
