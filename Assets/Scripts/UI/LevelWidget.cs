@@ -12,10 +12,15 @@ namespace Assets.Scripts.UI
         private void Start()
         {
             _gameSession = FindObjectOfType<GameSession>();
-            _gameSession.OnLevelChange += UpdateLevel;
+            _gameSession.OnLevelChange += PlayAnimation;
         }
 
-        private void UpdateLevel()
+        public void PlayAnimation()
+        {
+            _animator.SetTrigger("UpdateLevel");
+        }
+
+        public void UpdateLevel()
         {
             _levelText.text = _gameSession.CurrentLevel.ToString();
         }
