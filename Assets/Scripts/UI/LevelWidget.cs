@@ -6,6 +6,7 @@ namespace Assets.Scripts.UI
     public class LevelWidget : MonoBehaviour
     {
         [SerializeField] Text _levelText;
+        [SerializeField] private Animator _animator;
         private GameSession _gameSession;
 
         private void Start()
