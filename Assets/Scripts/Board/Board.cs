@@ -49,6 +49,15 @@ namespace Assets.Scripts.Board
             SetDefaultSpeed();
         }
 
+        public void OnExitGame()
+        {
+                Application.Quit();
+
+#if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+#endif
+        }
+
         private void OnDestroy()
         {
             _gameSession.OnLevelChange -= ChangeSpeed;

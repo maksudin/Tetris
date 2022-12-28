@@ -1,18 +1,24 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.Utils;
+using UnityEngine;
 
 namespace Assets.Scripts
 {
     public class PlayMusic : MonoBehaviour
     {
-        [SerializeField] private AudioClip _clip;
         private AudioSource _source;
 
-        public void Play()
+        private void Start()
         {
-            if (_source == null)
-                _source = GameObject.FindObjectOfType<AudioSource>();
+            _source = GameObject.FindGameObjectWithTag("AudioPlayer").GetComponent<AudioSource>();
+        }
 
-            _source.PlayOneShot(_clip);
+        private void Update()
+        {
+            if (!_source.isPlaying)
+            {
+                var randomClip = MusicRandomizer.GetRandomClip();
+                _source.PlayOneShot(randomClip);
+            }
         }
     }
 }
