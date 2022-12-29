@@ -18,18 +18,23 @@ namespace Assets.Scripts.Utils
 
         public AudioClip GetRandomClipFromList()
         {
-            if (_audioList.Count == 0)
-            {
-                var audioClips = DefsMusic.I.Clips;
-                foreach (var clip in audioClips)
-                    _audioList.Add(clip);
-            }
+            ReloadAudioList();
 
             var numOfClips = _audioList.Count;
             int randomNum = (int)System.Math.Floor(Random.value * numOfClips);
             var randomClip = _audioList[randomNum - 1];
             _audioList.RemoveAt(randomNum - 1);
             return randomClip;
+        }
+
+        private void ReloadAudioList()
+        {
+            if (_audioList.Count == 0)
+            {
+                var audioClips = DefsMusic.I.Clips;
+                foreach (var clip in audioClips)
+                    _audioList.Add(clip);
+            }
         }
     }
 }

@@ -333,7 +333,6 @@ namespace Assets.Scripts.Board
             _nextTetrominoDisplay.SetNextTetromino(nextPrefab);
         }
 
-
         private bool CheckUpperRowReached()
         {
             for (int x = 0; x < _boardSize.x; x++)
@@ -379,8 +378,6 @@ namespace Assets.Scripts.Board
             foreach (var cell in _tetrominoCoords)
                 _boardCells[(int)cell.x, (int)cell.y] = 1;
         }
-
-        
 
         private bool IsCellOutOfBounds(float coordX)
         {
