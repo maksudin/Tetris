@@ -25,3 +25,16 @@ MonoBehaviour:
   - {fileID: 8300000, guid: d589e9edf619fe1408adfb2dbe26c145, type: 3}
   - {fileID: 8300000, guid: a821f572b6adc9649bbd670a86eeebc9, type: 3}
   - {fileID: 8300000, guid: e74da4875a5316140b580fde0b35ba72, type: 3}
+  _sfx:
+  - _type: 0
+    _clips:
+    - {fileID: 8300000, guid: d340926266753f2459f8d5f816208a9a, type: 3}
+    - {fileID: 8300000, guid: 188b437a0b9d8c34faa685bcfa426112, type: 3}
+    - {fileID: 8300000, guid: 146d099f96aab9249a905e1882f289c7, type: 3}
+    - {fileID: 8300000, guid: 9dc855686813d8443ae028880295b16c, type: 3}
+  - _type: 1
+    _clips:
+    - {fileID: 8300000, guid: 39798d70cd44eeb46a4c500b356f96f5, type: 3}
+  - _type: 2
+    _clips:
+    - {fileID: 8300000, guid: 055d941345d61f54aafc28596c545c3b, type: 3}

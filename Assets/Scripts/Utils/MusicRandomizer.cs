@@ -11,9 +11,9 @@ namespace Assets.Scripts.Utils
         public static AudioClip GetRandomClip()
         {
             var audioClips = DefsMusic.I.Clips;
-            var numOfClips = audioClips.Length;
+            var numOfClips = audioClips.Length - 1;
             int randomNum = (int) System.Math.Floor(Random.value * numOfClips);
-            return audioClips[randomNum - 1];
+            return audioClips[randomNum];
         }
 
         public AudioClip GetRandomClipFromList()

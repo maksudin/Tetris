@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.Utils;
+﻿using Assets.Scripts.Model;
+using Assets.Scripts.Utils;
 using UnityEngine;
 
 namespace Assets.Scripts
@@ -19,6 +20,12 @@ namespace Assets.Scripts
                 var randomClip = MusicRandomizer.GetRandomClip();
                 _source.PlayOneShot(randomClip);
             }
+        }
+
+        public void PlaySfxOfType(SfxType type)
+        {
+            var clip = SfxUtils.GetRandomSfxOfType(type);
+            _source.PlayOneShot(clip);
         }
     }
 }

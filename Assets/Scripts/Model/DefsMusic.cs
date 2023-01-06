@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Assets.Scripts.Model
 {
@@ -6,8 +7,10 @@ namespace Assets.Scripts.Model
     public class DefsMusic : ScriptableObject
     {
         [SerializeField] private AudioClip[] _clips;
+        [SerializeField] private SfxClipCategories[] _sfx;
 
         public AudioClip[] Clips => _clips;
+        public SfxClipCategories[] SFX => _sfx;
 
         private static DefsMusic _instance;
         public static DefsMusic I => _instance == null ? LoadDefs() : _instance;
@@ -22,5 +25,21 @@ namespace Assets.Scripts.Model
         {
             _clips = Resources.LoadAll<AudioClip>("Music");
         }
+    }
+
+    [Serializable]
+    public struct SfxClipCategories
+    {
+        [SerializeField] private SfxType _type;
+        [SerializeField] private AudioClip[] _clips;
+
+        public AudioClip[] Clips => _clips;
+        public SfxType Type => _type;
+    }
+
+    [Serializable]
+    public enum SfxType
+    {
+        Cleared, Blocked, Lost
     }
 }

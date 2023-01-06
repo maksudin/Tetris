@@ -1,3 +1,4 @@
+using System;
 using Assets.Scripts.Model;
 using Assets.Scripts.Utils;
 using UnityEngine;
@@ -5,6 +6,9 @@ using UnityEngine.Events;
 
 namespace Assets.Scripts.Board
 {
+    [Serializable]
+    public class SfxUnityEvent : UnityEvent<SfxType> { }
+
     public class Board : MonoBehaviour
     {
         [SerializeField] private GameObject _blockedCellPrefab;
@@ -19,6 +23,10 @@ namespace Assets.Scripts.Board
 
         [SerializeField] public UnityEvent OnGameOver;
         [SerializeField] public UnityEvent OnRestart;
+
+        [SerializeField] public SfxUnityEvent OnLinesCleared;
+        [SerializeField] public SfxUnityEvent OnPieceDestroyed;
+        [SerializeField] public SfxUnityEvent OnGameOverSfx;
 
         private GameObject _tetrominoPrefab;
 
@@ -221,6 +229,7 @@ namespace Assets.Scripts.Board
 
             ResetSpawnedBlocks();
             Destroy(_tetromino.gameObject);
+            OnPieceDestroyed?.Invoke(SfxType.Blocked);
 
             _rotationCount = 0;
             _isHardDrop = false;
@@ -229,6 +238,7 @@ namespace Assets.Scripts.Board
             if (CheckUpperRowReached())
             {
                 OnGameOver?.Invoke();
+                OnGameOverSfx?.Invoke(SfxType.Lost);
                 return;
             }
 
@@ -249,6 +259,7 @@ namespace Assets.Scripts.Board
                 {
                     RemoveBlockedRow(y);
                     _linesCleared++;
+                    OnLinesCleared?.Invoke(SfxType.Cleared);
                     for (int i = y; i < _boardSize.y - 1; i++)
                         MoveRowTo(fromIndex: i + 1, toIndex: i);
 
@@ -258,6 +269,7 @@ namespace Assets.Scripts.Board
                 else if (isRowBlocked)
                 {
                     _linesCleared++;
+                    OnLinesCleared?.Invoke(SfxType.Cleared);
                     RemoveBlockedRow(y);
                 }
             }
