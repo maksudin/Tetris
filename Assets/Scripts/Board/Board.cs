@@ -52,7 +52,7 @@ namespace Assets.Scripts.Board
             _tGMRandomizer = GetComponent<TGMRandomizer>();
             _gameSession = FindObjectOfType<GameSession>();
             _score = FindObjectOfType<Score>();
-            _gameSession.OnLevelChange += ChangeSpeed;
+            _gameSession.OnLevelChange += OnLevelUp;
 
             SetDefaultSpeed();
         }
@@ -68,7 +68,14 @@ namespace Assets.Scripts.Board
 
         private void OnDestroy()
         {
-            _gameSession.OnLevelChange -= ChangeSpeed;
+            _gameSession.OnLevelChange -= OnLevelUp;
+        }
+
+        private void OnLevelUp()
+        {
+            ChangeSpeed();
+            //var clip = SfxUtils.GetRandomSfxOfType(SfxType.LevelUp);
+            //SfxUtils.PlaySfx(clip);
         }
 
         private void ChangeSpeed()

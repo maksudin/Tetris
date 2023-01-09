@@ -18,5 +18,11 @@ namespace Assets.Scripts.Utils
 
             return default;
         }
+
+        public static void PlaySfx(AudioClip clip)
+        {
+            var player = GameObject.FindGameObjectWithTag("AudioPlayer").GetComponent<AudioSource>();
+            player.PlayOneShot(clip);
+        }
     }
 }

@@ -6,26 +6,28 @@ namespace Assets.Scripts
 {
     public class PlayMusic : MonoBehaviour
     {
-        private AudioSource _source;
+        private AudioSource _musicSource;
+        private AudioSource _SfxSource;
 
         private void Start()
         {
-            _source = GameObject.FindGameObjectWithTag("AudioPlayer").GetComponent<AudioSource>();
+            _musicSource = GameObject.FindGameObjectWithTag("AudioPlayer").GetComponent<AudioSource>();
+            _SfxSource = GameObject.FindGameObjectWithTag("SFXPlayer").GetComponent<AudioSource>();
         }
 
         private void Update()
         {
-            if (!_source.isPlaying)
+            if (!_musicSource.isPlaying)
             {
                 var randomClip = MusicRandomizer.GetRandomClip();
-                _source.PlayOneShot(randomClip);
+                _musicSource.PlayOneShot(randomClip);
             }
         }
 
         public void PlaySfxOfType(SfxType type)
         {
             var clip = SfxUtils.GetRandomSfxOfType(type);
-            _source.PlayOneShot(clip);
+            _SfxSource.PlayOneShot(clip);
         }
     }
 }

@@ -20,10 +20,10 @@ namespace Assets.Scripts.Utils
         {
             ReloadAudioList();
 
-            var numOfClips = _audioList.Count;
+            var numOfClips = _audioList.Count - 1;
             int randomNum = (int)System.Math.Floor(Random.value * numOfClips);
-            var randomClip = _audioList[randomNum - 1];
-            _audioList.RemoveAt(randomNum - 1);
+            var randomClip = _audioList[randomNum];
+            _audioList.RemoveAt(randomNum);
             return randomClip;
         }
 
