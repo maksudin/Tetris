@@ -27,6 +27,7 @@ namespace Assets.Scripts
         public void PlaySfxOfType(SfxType type)
         {
             var clip = SfxUtils.GetRandomSfxOfType(type);
+            if (clip == null) return;
             _SfxSource.PlayOneShot(clip);
         }
     }

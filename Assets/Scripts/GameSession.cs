@@ -22,14 +22,6 @@ namespace Assets.Scripts
             CurrentLevel = DefsFacade.I.LevelDef.GetLevelInfo(0).LevelValue;
             Score.OnScoreChange += CheckLevelThreshold;
             OnLevelChange?.Invoke();
-            //PlayRandomAudioClip();
-        }
-
-        private void PlayRandomAudioClip()
-        {
-            var audioPlayerSource = GameObject.FindGameObjectWithTag("AudioPlayer").GetComponent<AudioSource>();
-            var randomClip = MusicRandomizer.GetRandomClip();
-            audioPlayerSource.PlayOneShot(randomClip);
         }
 
         private void OnDestroy()
