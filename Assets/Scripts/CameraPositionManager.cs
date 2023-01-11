@@ -44,8 +44,7 @@ namespace Assets.Scripts
 
         private float EaseInOutCubic(float x)
         {
-            var xxx = x * x * x;
-            return x < 0.5 ? 4 * xxx : 1 - Mathf.Pow(-2 * x + 2, 3) / 2;
+            return x < 0.5 ? 4 * x * x * x : 1 - Mathf.Pow(-2 * x + 2 , 3) / 2;
         }
     }
 }
