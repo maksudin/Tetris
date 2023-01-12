@@ -23,6 +23,7 @@ namespace Assets.Scripts.Board
 
         [SerializeField] public UnityEvent OnGameOver;
         [SerializeField] public UnityEvent OnRestart;
+        [SerializeField] public UnityEvent OnPause;
 
         [SerializeField] public SfxUnityEvent OnLinesCleared;
         [SerializeField] public SfxUnityEvent OnPieceDestroyed;
@@ -38,6 +39,9 @@ namespace Assets.Scripts.Board
         private int _rotationCount;
 
         private bool _isHardDrop;
+        private bool Paused;
+        private bool IsGameOver;
+        private bool IsGameStarted;
 
         private BlockedCell[] _blockedCells;
         private TGMRandomizer _tGMRandomizer;
@@ -45,7 +49,7 @@ namespace Assets.Scripts.Board
 
         private GameSession _gameSession;
         private Score _score;
-
+        
         private void Start()
         {
             _boardCells = new int[(int)_boardSize.x, (int)_boardSize.y];
@@ -57,13 +61,15 @@ namespace Assets.Scripts.Board
             SetDefaultSpeed();
         }
 
-        public void OnExitGame()
+        private void Update()
         {
-                Application.Quit();
-
-#if UNITY_EDITOR
-                UnityEditor.EditorApplication.isPlaying = false;
-#endif
+            if (!FallEnabled && _tetrominoPrefab == null) return;
+            if (Time.time > _nextFallTime)
+            {
+                _nextFallTime += _fallSpeed * _softDropMultiplier;
+                if (Paused) return;
+                Movement(new Vector2(0, -1));
+            }
         }
 
         private void OnDestroy()
@@ -71,42 +77,26 @@ namespace Assets.Scripts.Board
             _gameSession.OnLevelChange -= OnLevelUp;
         }
 
-        private void OnLevelUp()
+        public void PauseGame()
         {
-            ChangeSpeed();
-            //var clip = SfxUtils.GetRandomSfxOfType(SfxType.LevelUp);
-            //SfxUtils.PlaySfx(clip);
+            if (IsGameOver || !IsGameStarted) return; 
+
+            Paused = true;
+            ControlsUtils.DisableInput();
+            OnPause?.Invoke();
         }
 
-        private void ChangeSpeed()
+        public void UnPauseGame()
         {
-            var defSpeed = DefsFacade.I.LevelDef.GetLevelInfo(_gameSession.CurrentLevel).Speed;
-            _fallSpeed = defSpeed;
-        }
-
-        private void SetDefaultSpeed()
-        {
-            var defSpeed = DefsFacade.I.LevelDef.GetLevelInfo(0).Speed;
-            _fallSpeed = defSpeed;
-        }
-
-        private void Update()
-        {
-            if (!FallEnabled && _tetrominoPrefab == null) return;
-            if (Time.time > _nextFallTime)
-            {
-                _nextFallTime += _fallSpeed * _softDropMultiplier;
-                Movement(new Vector2(0, -1));
-            }
-        }
-
-        public void EnableControls()
-        {
+            Paused = false;
             ControlsUtils.EnableInput();
         }
 
         public void StartGame()
         {
+            IsGameOver = false;
+            IsGameStarted = true;
+
             _tetrominoPrefab = _tGMRandomizer.GetRandomizedPrefab(isFirstTetromino: true);
             _nextTetrominoDisplay = FindObjectOfType<NextTetrominoDisplay>();
 
@@ -246,6 +236,7 @@ namespace Assets.Scripts.Board
             {
                 OnGameOver?.Invoke();
                 OnGameOverSfx?.Invoke(SfxType.Lost);
+                IsGameOver = true;
                 return;
             }
 
@@ -479,6 +470,39 @@ namespace Assets.Scripts.Board
                 _tetromino.Pieces[0].YPos + center.y + 0.5f,
                 center.z
             );
+        }
+
+        public void OnExitGame()
+        {
+            Application.Quit();
+
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#endif
+        }
+
+        private void OnLevelUp()
+        {
+            ChangeSpeed();
+            //var clip = SfxUtils.GetRandomSfxOfType(SfxType.LevelUp);
+            //SfxUtils.PlaySfx(clip);
+        }
+
+        private void ChangeSpeed()
+        {
+            var defSpeed = DefsFacade.I.LevelDef.GetLevelInfo(_gameSession.CurrentLevel).Speed;
+            _fallSpeed = defSpeed;
+        }
+
+        private void SetDefaultSpeed()
+        {
+            var defSpeed = DefsFacade.I.LevelDef.GetLevelInfo(0).Speed;
+            _fallSpeed = defSpeed;
+        }
+
+        public void EnableControls()
+        {
+            ControlsUtils.EnableInput();
         }
     }
 }
