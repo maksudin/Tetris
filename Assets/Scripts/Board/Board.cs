@@ -12,6 +12,7 @@ namespace Assets.Scripts.Board
     public class Board : MonoBehaviour
     {
         [SerializeField] private GameObject _blockedCellPrefab;
+        [SerializeField] private GameObject _clearLinePrefab;
         [SerializeField] private Vector2 _boardSize = new Vector2(10, 20);
         [SerializeField] private Transform _spawnPivot;
 
