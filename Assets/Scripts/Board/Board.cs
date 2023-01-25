@@ -12,7 +12,7 @@ namespace Assets.Scripts.Board
     public class Board : MonoBehaviour
     {
         [SerializeField] private GameObject _blockedCellPrefab;
-        [SerializeField] private GameObject _clearLinePrefab;
+        [SerializeField] private GameObject _lineClearPrefab;
         [SerializeField] private Vector2 _boardSize = new Vector2(10, 20);
         [SerializeField] private Transform _spawnPivot;
 
@@ -225,7 +225,8 @@ namespace Assets.Scripts.Board
             if (_linesCleared > 0)
                 _score.AddScorePointsForLines(_linesCleared, _gameSession.CurrentLevel);
 
-            ResetSpawnedBlocks();
+            //CreateMissingBlockedCells();
+
             Destroy(_tetromino.gameObject);
             OnPieceDestroyed?.Invoke(SfxType.Blocked);
 
@@ -253,24 +254,91 @@ namespace Assets.Scripts.Board
             for (int y = 0; y < _boardSize.y - 1; y++)
             {
                 bool upperEdge = y == _boardSize.y - 1;
-                bool isRowBlocked = IsRowBlocked(y);
-                if (isRowBlocked && !upperEdge)
+                if (IsRowBlocked(y) && !upperEdge)
                 {
                     RemoveBlockedRow(y);
+                    SpawnLineClear(y);
                     _linesCleared++;
                     OnLinesCleared?.Invoke(SfxType.Cleared);
-                    for (int i = y; i < _boardSize.y - 1; i++)
-                        MoveRowTo(fromIndex: i + 1, toIndex: i);
-
-                    FindAndMoveBlockedRows();
                 }
+            }
 
-                else if (isRowBlocked)
+            if (_linesCleared > 0)
+                RearrangeRows();
+        }
+
+        private void RearrangeRows()
+        {
+            for (int y = 0; y < _boardSize.y - 1; y++)
+            {
+                if (IsRowEmpty(y) && RowHasBlocks(y + 1))
                 {
-                    _linesCleared++;
-                    OnLinesCleared?.Invoke(SfxType.Cleared);
-                    RemoveBlockedRow(y);
+                    SwapRows(y, y + 1);
+                    RearrangeRows();
+                    break;
                 }
+            }
+        }
+
+        public void CreateMissingBlockedCells()
+        {
+            FindBlockedCellObjects();
+            for (int x = 0; x < _boardSize.x; x++)
+                for (int y = 0; y < _boardSize.y; y++)
+                {
+                    var blockedCell = FindBlockedCell(x, y);
+
+                    if (blockedCell != null && !blockedCell.IsVisible)
+                        blockedCell.SetVisibility(true);
+
+                    if (_boardCells[x, y] == 1 && blockedCell == null)
+                    {
+                        GameObject spawned = SpawnBlockedCell();
+                        spawned.GetComponent<SpriteRenderer>().sprite = _tetromino.Sprite;
+                        BlockedCell blocked = spawned.GetComponent<BlockedCell>();
+                        blocked.Piece.XPos = x;
+                        blocked.Piece.YPos = y;
+                        spawned.transform.position = new Vector3(x + 0.5f, y + 0.5f, transform.position.z);
+                        continue;
+                    }
+                }
+        }
+
+        public void DestroyRedundantCells()
+        {
+            FindBlockedCellObjects();
+            for (int x = 0; x < _boardSize.x; x++)
+                for (int y = 0; y < _boardSize.y; y++)
+                {
+                    var blockedCell = FindBlockedCell(x, y);
+                    if (_boardCells[x, y] == 0 && blockedCell != null)
+                        Destroy(blockedCell.gameObject);
+                }
+        }
+
+        private void SpawnLineClear(int y)
+        {
+            var spawned = SpawnUtills.Spawn(_lineClearPrefab, _spawnPivot.position);
+            var boardPos = _tetromino.transform.position;
+            spawned.transform.position = new Vector3(0, y, boardPos.z);
+            spawned.GetComponent<ClearLineController>().ClearAnimation();
+        }
+
+        private void SwapRows(int row1, int row2)
+        {
+            int[] row1Vals = new int[(int)_boardSize.x];
+            int[] row2Vals = new int[(int)_boardSize.x];
+
+            for (int x = 0; x < _boardSize.x; x++)
+            {
+                row1Vals[x] = _boardCells[x, row1];
+                row2Vals[x] = _boardCells[x, row2];
+            }
+
+            for (int x = 0; x < _boardSize.x; x++)
+            {
+                _boardCells[x, row1] = row2Vals[x];
+                _boardCells[x, row2] = row1Vals[x];
             }
         }
 
@@ -295,6 +363,15 @@ namespace Assets.Scripts.Board
             return blockedRow;
         }
 
+        private bool RowHasBlocks(int y)
+        {
+            for (int x = 0; x < _boardSize.x; x++)
+                if (_boardCells[x, y] == 1)
+                    return true;
+
+            return false;
+        }
+
         private bool IsRowBlocked(int y)
         {
             int countBlocked = 0;
@@ -302,13 +379,32 @@ namespace Assets.Scripts.Board
                 if (_boardCells[x, y] == 1)
                     countBlocked++;
 
-            return countBlocked == _boardSize.x ? true : false;
+            return countBlocked == _boardSize.x;
+        }
+
+        private bool IsRowEmpty(int y)
+        {
+            int countEmpty = 0;
+            for (int x = 0; x < _boardSize.x; x++)
+                if (_boardCells[x, y] == 0)
+                    countEmpty++;
+
+            return countEmpty == _boardSize.x;
         }
 
         private void RemoveBlockedRow(int y)
         {
             for (int x = 0; x < _boardSize.x; x++)
                 _boardCells[x, y] = 0;
+
+            FindBlockedCellObjects();
+
+            for (int x = 0; x < _boardSize.x; x++)
+            {
+                var blockedCell = FindBlockedCell(x, y);
+                if (blockedCell != null)
+                    blockedCell.SetVisibility(false);
+            }
         }
 
         public void Restart()
@@ -335,7 +431,7 @@ namespace Assets.Scripts.Board
                 for (int y = 0; y < _boardSize.y; y++)
                     _boardCells[x, y] = 0;
 
-            ResetSpawnedBlocks();
+            DestroyRedundantCells();
         }
 
         private void UpdateNextTetrominoDisplay()
@@ -353,28 +449,6 @@ namespace Assets.Scripts.Board
             return false;
         }
 
-        private void ResetSpawnedBlocks()
-        {
-            FindBlockedCellObjects();
-            for (int x = 0; x < _boardSize.x; x++)
-                for (int y = 0; y < _boardSize.y; y++)
-                {
-                    var blockedCell = FindBlockedCell(x, y);
-                    if (_boardCells[x, y] == 1 && blockedCell == null)
-                    {
-                        GameObject spawned = SpawnBlockedCell();
-                        spawned.GetComponent<SpriteRenderer>().sprite = _tetromino.Sprite;
-                        BlockedCell blocked = spawned.GetComponent<BlockedCell>();
-                        blocked.Piece.XPos = x;
-                        blocked.Piece.YPos = y;
-                        spawned.transform.position = new Vector3(x + 0.5f, y + 0.5f, transform.position.z);
-                        continue;
-                    }
-                    if (_boardCells[x, y] == 0 && blockedCell != null)
-                        Destroy(blockedCell.gameObject);
-                }
-        }
-
         private BlockedCell FindBlockedCell(int x, int y)
         {
             foreach (var cell in _blockedCells)
@@ -386,8 +460,23 @@ namespace Assets.Scripts.Board
 
         private void BlockTetrominoCells()
         {
+            FindBlockedCellObjects();
             foreach (var cell in _tetrominoCoords)
-                _boardCells[(int)cell.x, (int)cell.y] = 1;
+            {
+                var x = (int)cell.x;
+                var y = (int)cell.y;
+                _boardCells[x, y] = 1;
+
+                GameObject spawned = SpawnBlockedCell();
+                spawned.GetComponent<SpriteRenderer>().sprite = _tetromino.Sprite;
+                BlockedCell blocked = spawned.GetComponent<BlockedCell>();
+                blocked.Piece.XPos = x;
+                blocked.Piece.YPos = y;
+                spawned.transform.position = new Vector3(x + 0.5f, y + 0.5f, transform.position.z);
+                continue;
+            }
+
+
         }
 
         private bool IsCellOutOfBounds(float coordX)
@@ -423,16 +512,16 @@ namespace Assets.Scripts.Board
             Gizmos.color = Color.white;
 
 
-            //Vector3 pos = transform.position;
+            Vector3 pos = transform.position;
 
-            //if (_TetrominoCoords.Length != 0)
-            //{
-            //    // Tetromino
-            //    foreach (var coord in _TetrominoCoords)
-            //        DrawUtils.DrawCell(pos, coord);
-            //}
+            if (_tetrominoCoords.Length != 0)
+            {
+                // Tetromino
+                foreach (var coord in _tetrominoCoords)
+                    DrawUtils.DrawCell(pos, coord);
+            }
 
-            //DrawBlockedCells(pos);
+            DrawBlockedCells(pos);
         }
 
         private void DrawBlockedCells(Vector3 pos)
