@@ -256,8 +256,11 @@ namespace Assets.Scripts.Board
                 bool upperEdge = y == _boardSize.y - 1;
                 if (IsRowBlocked(y) && !upperEdge)
                 {
+                    var sprites = GetBlockedRowSprites(y);
                     RemoveBlockedRow(y);
-                    SpawnLineClear(y);
+                    var spawned = SpawnLineClear(y);
+                    spawned.GetComponent<ClearLineController>().SetLineSprites(sprites);
+
                     _linesCleared++;
                     OnLinesCleared?.Invoke(SfxType.Cleared);
                 }
@@ -265,6 +268,20 @@ namespace Assets.Scripts.Board
 
             if (_linesCleared > 0)
                 RearrangeRows();
+        }
+
+        private Sprite[] GetBlockedRowSprites(int y)
+        {
+            Sprite[] sprites = new Sprite[(int)_boardSize.x];
+            FindBlockedCellObjects();
+            for (int x = 0; x < _boardSize.x; x++)
+            {
+                var blockedCell = FindBlockedCell(x, y);
+                if (blockedCell != null)
+                    sprites[x] = blockedCell.GetComponent<SpriteRenderer>().sprite;
+            }
+
+            return sprites;
         }
 
         private void RearrangeRows()
@@ -316,12 +333,14 @@ namespace Assets.Scripts.Board
                 }
         }
 
-        private void SpawnLineClear(int y)
+        private GameObject SpawnLineClear(int y)
         {
             var spawned = SpawnUtills.Spawn(_lineClearPrefab, _spawnPivot.position);
             var boardPos = _tetromino.transform.position;
             spawned.transform.position = new Vector3(0, y, boardPos.z);
             spawned.GetComponent<ClearLineController>().ClearAnimation();
+
+            return spawned;
         }
 
         private void SwapRows(int row1, int row2)
@@ -475,8 +494,6 @@ namespace Assets.Scripts.Board
                 spawned.transform.position = new Vector3(x + 0.5f, y + 0.5f, transform.position.z);
                 continue;
             }
-
-
         }
 
         private bool IsCellOutOfBounds(float coordX)
@@ -512,16 +529,16 @@ namespace Assets.Scripts.Board
             Gizmos.color = Color.white;
 
 
-            Vector3 pos = transform.position;
+            //Vector3 pos = transform.position;
 
-            if (_tetrominoCoords.Length != 0)
-            {
-                // Tetromino
-                foreach (var coord in _tetrominoCoords)
-                    DrawUtils.DrawCell(pos, coord);
-            }
+            //if (_tetrominoCoords.Length != 0)
+            //{
+            //    // Tetromino
+            //    foreach (var coord in _tetrominoCoords)
+            //        DrawUtils.DrawCell(pos, coord);
+            //}
 
-            DrawBlockedCells(pos);
+            //DrawBlockedCells(pos);
         }
 
         private void DrawBlockedCells(Vector3 pos)
