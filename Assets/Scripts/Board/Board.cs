@@ -287,14 +287,12 @@ namespace Assets.Scripts.Board
         private void RearrangeRows()
         {
             for (int y = 0; y < _boardSize.y - 1; y++)
-            {
                 if (IsRowEmpty(y) && RowHasBlocks(y + 1))
                 {
                     SwapRows(y, y + 1);
                     RearrangeRows();
                     break;
                 }
-            }
         }
 
         public void CreateMissingBlockedCells()
@@ -304,9 +302,6 @@ namespace Assets.Scripts.Board
                 for (int y = 0; y < _boardSize.y; y++)
                 {
                     var blockedCell = FindBlockedCell(x, y);
-
-                    if (blockedCell != null && !blockedCell.IsVisible)
-                        blockedCell.SetVisibility(true);
 
                     if (_boardCells[x, y] == 1 && blockedCell == null)
                     {
@@ -318,6 +313,21 @@ namespace Assets.Scripts.Board
                         spawned.transform.position = new Vector3(x + 0.5f, y + 0.5f, transform.position.z);
                         continue;
                     }
+
+                    else if (/*_boardCells[x, y] == 1 && */blockedCell != null && !blockedCell.IsVisible)
+                        blockedCell.SetVisibility(true);
+                }
+        }
+
+        private void DestroyAllBlockedCells()
+        {
+            FindBlockedCellObjects();
+            for (int x = 0; x < _boardSize.x; x++)
+                for (int y = 0; y < _boardSize.y; y++)
+                {
+                    var blockedCell = FindBlockedCell(x, y);
+                    if (blockedCell != null)
+                        Destroy(blockedCell.gameObject);
                 }
         }
 
@@ -338,8 +348,6 @@ namespace Assets.Scripts.Board
             var spawned = SpawnUtills.Spawn(_lineClearPrefab, _spawnPivot.position);
             var boardPos = _tetromino.transform.position;
             spawned.transform.position = new Vector3(0, y, boardPos.z);
-            spawned.GetComponent<ClearLineController>().ClearAnimation();
-
             return spawned;
         }
 
@@ -429,6 +437,7 @@ namespace Assets.Scripts.Board
         public void Restart()
         {
             RemoveAllBlockedCells();
+            
             _isHardDrop = false;
 
             _tGMRandomizer.ResetHistory();
@@ -450,7 +459,8 @@ namespace Assets.Scripts.Board
                 for (int y = 0; y < _boardSize.y; y++)
                     _boardCells[x, y] = 0;
 
-            DestroyRedundantCells();
+            //DestroyRedundantCells();
+            DestroyAllBlockedCells();
         }
 
         private void UpdateNextTetrominoDisplay()
