@@ -16,13 +16,12 @@ public class ClearLineController : MonoBehaviour
     {
         var board = FindObjectOfType<Board>();
         board.DestroyRedundantCells();
-        board.CreateMissingBlockedCells();
+        //board.CreateMissingBlockedCells();
+        board.MoveBlockedCellsDown();
     }
 
     public void OnAnimationComplete()
     {
         Destroy(gameObject);
     }
-
-
 }

@@ -6246,7 +6246,7 @@ MonoBehaviour:
   _spawnPivot: {fileID: 164929157}
   _fallSpeed: 0.852
   _softDropMultiplier: 1.2
-  FallEnabled: 1
+  _fallEnabled: 1
   OnGameOver:
     m_PersistentCalls:
       m_Calls:

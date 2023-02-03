@@ -11,5 +11,10 @@ public class BlockedCell : MonoBehaviour
         GetComponent<SpriteRenderer>().enabled = visibility;
     }
 
+    public void SetPosition()
+    {
+        transform.position = new Vector3(Piece.XPos + 0.5f, Piece.YPos + 0.5f, transform.position.z);
+    }
+
 
 }

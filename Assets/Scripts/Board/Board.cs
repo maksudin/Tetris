@@ -18,8 +18,9 @@ namespace Assets.Scripts.Board
 
         [Range(0, 1)]
         [SerializeField] private float _fallSpeed = 0.1f;
+
         [SerializeField] private float _softDropMultiplier = 1f;
-        [SerializeField] private bool FallEnabled;
+        [SerializeField] private bool _fallEnabled;
         private float _nextFallTime = 0.0f;
 
         [SerializeField] public UnityEvent OnGameOver;
@@ -40,9 +41,9 @@ namespace Assets.Scripts.Board
         private int _rotationCount;
 
         private bool _isHardDrop;
-        private bool Paused;
-        private bool IsGameOver;
-        private bool IsGameStarted;
+        private bool _isPaused;
+        private bool _isGameOver;
+        private bool _isGameStarted;
 
         private BlockedCell[] _blockedCells;
         private TGMRandomizer _tGMRandomizer;
@@ -64,11 +65,10 @@ namespace Assets.Scripts.Board
 
         private void Update()
         {
-            if (!FallEnabled && _tetrominoPrefab == null) return;
             if (Time.time > _nextFallTime)
             {
                 _nextFallTime += _fallSpeed * _softDropMultiplier;
-                if (Paused) return;
+                if (_isPaused || !_isGameStarted || !_fallEnabled) return;
                 Movement(new Vector2(0, -1));
             }
         }
@@ -80,23 +80,23 @@ namespace Assets.Scripts.Board
 
         public void PauseGame()
         {
-            if (IsGameOver || !IsGameStarted) return; 
+            if (_isGameOver || !_isGameStarted) return; 
 
-            Paused = true;
+            _isPaused = true;
             ControlsUtils.DisableInput();
             OnPause?.Invoke();
         }
 
         public void UnPauseGame()
         {
-            Paused = false;
+            _isPaused = false;
             ControlsUtils.EnableInput();
         }
 
         public void StartGame()
         {
-            IsGameOver = false;
-            IsGameStarted = true;
+            _isGameOver = false;
+            _isGameStarted = true;
 
             _tetrominoPrefab = _tGMRandomizer.GetRandomizedPrefab(isFirstTetromino: true);
             _nextTetrominoDisplay = FindObjectOfType<NextTetrominoDisplay>();
@@ -168,7 +168,7 @@ namespace Assets.Scripts.Board
             if (_isHardDrop) return;
             _direction = direction;
 
-            if (FallEnabled) 
+            if (_fallEnabled) 
                 Movement(new Vector2(_direction.x, 0));
             else
                 Movement(_direction);
@@ -238,7 +238,7 @@ namespace Assets.Scripts.Board
             {
                 OnGameOver?.Invoke();
                 OnGameOverSfx?.Invoke(SfxType.Lost);
-                IsGameOver = true;
+                _isGameOver = true;
                 return;
             }
 
@@ -266,8 +266,8 @@ namespace Assets.Scripts.Board
                 }
             }
 
-            if (_linesCleared > 0)
-                RearrangeRows();
+            //if (_linesCleared > 0)
+            //    RearrangeRows();
         }
 
         private Sprite[] GetBlockedRowSprites(int y)
@@ -295,6 +295,8 @@ namespace Assets.Scripts.Board
                 }
         }
 
+
+
         public void CreateMissingBlockedCells()
         {
             FindBlockedCellObjects();
@@ -310,11 +312,11 @@ namespace Assets.Scripts.Board
                         BlockedCell blocked = spawned.GetComponent<BlockedCell>();
                         blocked.Piece.XPos = x;
                         blocked.Piece.YPos = y;
-                        spawned.transform.position = new Vector3(x + 0.5f, y + 0.5f, transform.position.z);
+                        blocked.SetPosition();
                         continue;
                     }
 
-                    else if (/*_boardCells[x, y] == 1 && */blockedCell != null && !blockedCell.IsVisible)
+                    else if (_boardCells[x, y] == 1 && blockedCell != null && !blockedCell.IsVisible)
                         blockedCell.SetVisibility(true);
                 }
         }
@@ -322,18 +324,23 @@ namespace Assets.Scripts.Board
         private void DestroyAllBlockedCells()
         {
             FindBlockedCellObjects();
-            for (int x = 0; x < _boardSize.x; x++)
-                for (int y = 0; y < _boardSize.y; y++)
-                {
-                    var blockedCell = FindBlockedCell(x, y);
-                    if (blockedCell != null)
-                        Destroy(blockedCell.gameObject);
-                }
+            foreach (var cell in _blockedCells)
+                Destroy(cell.gameObject);
         }
 
         public void DestroyRedundantCells()
         {
             FindBlockedCellObjects();
+
+            //for (int y = 0; y < _boardSize.y; y++)
+            //    if (IsRowBlocked(y))
+            //        for (int x = 0; x < _boardSize.x; x++)
+            //        {
+            //            var blockedCell = FindBlockedCell(x, y);
+            //            Destroy(blockedCell.gameObject);
+            //        }
+
+
             for (int x = 0; x < _boardSize.x; x++)
                 for (int y = 0; y < _boardSize.y; y++)
                 {
@@ -341,6 +348,25 @@ namespace Assets.Scripts.Board
                     if (_boardCells[x, y] == 0 && blockedCell != null)
                         Destroy(blockedCell.gameObject);
                 }
+        }
+
+        public void MoveBlockedCellsDown()
+        {
+            for (int x = 0; x < _boardSize.x; x++)
+                for (int y = 0; y < _boardSize.y; y++)
+                {
+                    var blockedCell = FindBlockedCell(x, y);
+
+                    if (_boardCells[x, y] == 1 && blockedCell != null)
+                    {
+
+                        //if (blockedCell.Piece.YPos == 0) continue;
+                        blockedCell.Piece.YPos -= 1;
+                        blockedCell.SetPosition();
+                    }
+                }
+
+            RearrangeRows();
         }
 
         private GameObject SpawnLineClear(int y)
@@ -424,14 +450,14 @@ namespace Assets.Scripts.Board
             for (int x = 0; x < _boardSize.x; x++)
                 _boardCells[x, y] = 0;
 
-            FindBlockedCellObjects();
+            //FindBlockedCellObjects();
 
-            for (int x = 0; x < _boardSize.x; x++)
-            {
-                var blockedCell = FindBlockedCell(x, y);
-                if (blockedCell != null)
-                    blockedCell.SetVisibility(false);
-            }
+            //for (int x = 0; x < _boardSize.x; x++)
+            //{
+            //    var blockedCell = FindBlockedCell(x, y);
+            //    if (blockedCell != null)
+            //        blockedCell.SetVisibility(false);
+            //}
         }
 
         public void Restart()
@@ -539,16 +565,16 @@ namespace Assets.Scripts.Board
             Gizmos.color = Color.white;
 
 
-            //Vector3 pos = transform.position;
+            Vector3 pos = transform.position;
 
-            //if (_tetrominoCoords.Length != 0)
-            //{
-            //    // Tetromino
-            //    foreach (var coord in _tetrominoCoords)
-            //        DrawUtils.DrawCell(pos, coord);
-            //}
+            if (_tetrominoCoords.Length != 0)
+            {
+                // Tetromino
+                foreach (var coord in _tetrominoCoords)
+                    DrawUtils.DrawCell(pos, coord);
+            }
 
-            //DrawBlockedCells(pos);
+            DrawBlockedCells(pos);
         }
 
         private void DrawBlockedCells(Vector3 pos)
