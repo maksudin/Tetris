@@ -17,7 +17,8 @@ public class ClearLineController : MonoBehaviour
         var board = FindObjectOfType<Board>();
         board.DestroyRedundantCells();
         //board.CreateMissingBlockedCells();
-        board.MoveBlockedCellsDown();
+        //board.MoveBlockedCellsDown();
+        board.RearrangeBlockedCells();
     }
 
     public void OnAnimationComplete()

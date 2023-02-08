@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Assets.Scripts.Model;
 using Assets.Scripts.Utils;
 using UnityEngine;
@@ -44,6 +45,7 @@ namespace Assets.Scripts.Board
         private bool _isPaused;
         private bool _isGameOver;
         private bool _isGameStarted;
+        private bool _hardDropDisabled;
 
         private BlockedCell[] _blockedCells;
         private TGMRandomizer _tGMRandomizer;
@@ -124,6 +126,7 @@ namespace Assets.Scripts.Board
 
         public void HardDrop()
         {
+            if (_hardDropDisabled) return;
             _isHardDrop = true;
             Movement(new Vector2(0, -1));
         }
@@ -219,14 +222,17 @@ namespace Assets.Scripts.Board
         private int _linesCleared;
         private int _clearLineCalls;
         private int _moveCount;
-
+        
         private void CleanUpAndPrepareNextTetromino()
         {
             BlockTetrominoCells();
             FindBlockedCellObjects();
             RemoveBlockedRows();
             if (_linesCleared > 0)
+            {
                 _score.AddScorePointsForLines(_linesCleared, _gameSession.CurrentLevel);
+                _hardDropDisabled = true;
+            }
 
             //CreateMissingBlockedCells();
 
@@ -250,6 +256,7 @@ namespace Assets.Scripts.Board
             UpdateNextTetrominoDisplay();
             SpawnTetromino();
             SetTetrominoCoords(_spawnPivot.position);
+
         }
 
         private void RemoveBlockedRows()
@@ -330,15 +337,59 @@ namespace Assets.Scripts.Board
 
                     if (_boardCells[x, y] == 1 && blockedCell != null)
                     {
-
-                        if (blockedCell.Piece.YPos == 0) continue;
-                        blockedCell.Piece.YPos -= _moveCount;
+                        var nYPos = blockedCell.Piece.YPos - _moveCount;
+                        if (nYPos < 0) continue;
+                        blockedCell.Piece.YPos = nYPos;
                         blockedCell.SetPosition();
                     }
                 }
 
             RearrangeRows();
             _moveCount = 0;
+            _hardDropDisabled = false;
+        }
+
+        public void RearrangeBlockedCells()
+        {
+            if (_clearLineCalls != 0) return;
+            RearrangeRows();
+            FindBlockedCellObjects();
+            List<BlockedCell> freeBlockedCells = GetFreeBlockedCells();
+            List<Vector2> boardCellCoords = GetAllBlockedBoardCellCoords();
+            for (int i = 0; i < freeBlockedCells.Count; i++)
+            {
+
+                freeBlockedCells[i].Piece.XPos = (int)boardCellCoords[i].x;
+                freeBlockedCells[i].Piece.YPos = (int)boardCellCoords[i].y - 1;
+                freeBlockedCells[i].SetPosition();
+            }
+            
+            _moveCount = 0;
+            _hardDropDisabled = false;
+        }
+
+        private List<BlockedCell> GetFreeBlockedCells()
+        {
+            var freeBls = new List<BlockedCell>();
+            foreach (var bl in _blockedCells)
+            {
+                var blx = (int)bl.Piece.XPos;
+                var bly = (int)bl.Piece.YPos;
+                if (_boardCells[blx, bly] == 1)
+                    freeBls.Add(bl);
+            }
+            return freeBls;
+        }
+
+        private List<Vector2> GetAllBlockedBoardCellCoords()
+        {
+            var coords = new List<Vector2>();
+            for (int x = 0; x < _boardSize.x; x++)
+                for (int y = 0; y < _boardSize.y; y++)
+                    if (_boardCells[x, y] == 1)
+                        coords.Add(new Vector2(x, y));
+
+            return coords;
         }
 
         public void CreateMissingBlockedCells()
