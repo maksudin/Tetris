@@ -360,7 +360,7 @@ namespace Assets.Scripts.Board
             {
 
                 freeBlockedCells[i].Piece.XPos = (int)boardCellCoords[i].x;
-                freeBlockedCells[i].Piece.YPos = (int)boardCellCoords[i].y - 1;
+                freeBlockedCells[i].Piece.YPos = (int)boardCellCoords[i].y;
                 freeBlockedCells[i].SetPosition();
             }
             
@@ -372,12 +372,9 @@ namespace Assets.Scripts.Board
         {
             var freeBls = new List<BlockedCell>();
             foreach (var bl in _blockedCells)
-            {
-                var blx = (int)bl.Piece.XPos;
-                var bly = (int)bl.Piece.YPos;
-                if (_boardCells[blx, bly] == 1)
+                if (bl.IsVisible)
                     freeBls.Add(bl);
-            }
+
             return freeBls;
         }
 
@@ -624,16 +621,16 @@ namespace Assets.Scripts.Board
             Gizmos.color = Color.white;
 
 
-            Vector3 pos = transform.position;
+            //Vector3 pos = transform.position;
 
-            if (_tetrominoCoords.Length != 0)
-            {
-                // Tetromino
-                foreach (var coord in _tetrominoCoords)
-                    DrawUtils.DrawCell(pos, coord);
-            }
+            //if (_tetrominoCoords.Length != 0)
+            //{
+            //    // Tetromino
+            //    foreach (var coord in _tetrominoCoords)
+            //        DrawUtils.DrawCell(pos, coord);
+            //}
 
-            DrawBlockedCells(pos);
+            //DrawBlockedCells(pos);
         }
 
         private void DrawBlockedCells(Vector3 pos)

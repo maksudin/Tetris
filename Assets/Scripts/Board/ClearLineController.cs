@@ -18,6 +18,7 @@ public class ClearLineController : MonoBehaviour
         board.DestroyRedundantCells();
         //board.CreateMissingBlockedCells();
         //board.MoveBlockedCellsDown();
+        // Тогда цвета то не те выставляются!!!
         board.RearrangeBlockedCells();
     }
 
