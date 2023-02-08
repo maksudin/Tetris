@@ -331,7 +331,7 @@ namespace Assets.Scripts.Board
                     if (_boardCells[x, y] == 1 && blockedCell != null)
                     {
 
-                        //if (blockedCell.Piece.YPos == 0) continue;
+                        if (blockedCell.Piece.YPos == 0) continue;
                         blockedCell.Piece.YPos -= _moveCount;
                         blockedCell.SetPosition();
                     }
