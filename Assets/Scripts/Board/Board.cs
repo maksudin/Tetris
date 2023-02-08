@@ -217,11 +217,14 @@ namespace Assets.Scripts.Board
         }
 
         private int _linesCleared;
+        private int _clearLineCalls;
+        private int _moveCount;
 
         private void CleanUpAndPrepareNextTetromino()
         {
             BlockTetrominoCells();
-            FindAndMoveBlockedRows();
+            FindBlockedCellObjects();
+            RemoveBlockedRows();
             if (_linesCleared > 0)
                 _score.AddScorePointsForLines(_linesCleared, _gameSession.CurrentLevel);
 
@@ -249,7 +252,7 @@ namespace Assets.Scripts.Board
             SetTetrominoCoords(_spawnPivot.position);
         }
 
-        private void FindAndMoveBlockedRows()
+        private void RemoveBlockedRows()
         {
             for (int y = 0; y < _boardSize.y - 1; y++)
             {
@@ -266,22 +269,11 @@ namespace Assets.Scripts.Board
                 }
             }
 
+            _clearLineCalls = _linesCleared;
+            _moveCount = _linesCleared;
+
             //if (_linesCleared > 0)
             //    RearrangeRows();
-        }
-
-        private Sprite[] GetBlockedRowSprites(int y)
-        {
-            Sprite[] sprites = new Sprite[(int)_boardSize.x];
-            FindBlockedCellObjects();
-            for (int x = 0; x < _boardSize.x; x++)
-            {
-                var blockedCell = FindBlockedCell(x, y);
-                if (blockedCell != null)
-                    sprites[x] = blockedCell.GetComponent<SpriteRenderer>().sprite;
-            }
-
-            return sprites;
         }
 
         private void RearrangeRows()
@@ -295,7 +287,59 @@ namespace Assets.Scripts.Board
                 }
         }
 
+        private void DestroyAllBlockedCells()
+        {
+            FindBlockedCellObjects();
 
+            foreach (var cell in _blockedCells)
+                Destroy(cell.gameObject);
+        }
+
+        public void DestroyRedundantCells()
+        {
+            _clearLineCalls -= 1;
+            if (_clearLineCalls != 0) return;
+
+            //for (int y = 0; y < _boardSize.y; y++)
+            //    if (IsRowBlocked(y))
+            //        for (int x = 0; x < _boardSize.x; x++)
+            //        {
+            //            var blockedCell = FindBlockedCell(x, y);
+            //            Destroy(blockedCell.gameObject);
+            //        }
+
+
+            for (int x = 0; x < _boardSize.x; x++)
+                for (int y = 0; y < _boardSize.y; y++)
+                {
+                    var blockedCell = FindBlockedCell(x, y);
+                    if (_boardCells[x, y] == 0 && blockedCell != null)
+                        Destroy(blockedCell.gameObject);
+                }
+        }
+
+        public void MoveBlockedCellsDown()
+        {
+            if (_clearLineCalls != 0) return;
+            FindBlockedCellObjects();
+
+            for (int x = 0; x < _boardSize.x; x++)
+                for (int y = 0; y < _boardSize.y; y++)
+                {
+                    var blockedCell = FindBlockedCell(x, y);
+
+                    if (_boardCells[x, y] == 1 && blockedCell != null)
+                    {
+
+                        //if (blockedCell.Piece.YPos == 0) continue;
+                        blockedCell.Piece.YPos -= _moveCount;
+                        blockedCell.SetPosition();
+                    }
+                }
+
+            RearrangeRows();
+            _moveCount = 0;
+        }
 
         public void CreateMissingBlockedCells()
         {
@@ -319,54 +363,6 @@ namespace Assets.Scripts.Board
                     else if (_boardCells[x, y] == 1 && blockedCell != null && !blockedCell.IsVisible)
                         blockedCell.SetVisibility(true);
                 }
-        }
-
-        private void DestroyAllBlockedCells()
-        {
-            FindBlockedCellObjects();
-            foreach (var cell in _blockedCells)
-                Destroy(cell.gameObject);
-        }
-
-        public void DestroyRedundantCells()
-        {
-            FindBlockedCellObjects();
-
-            //for (int y = 0; y < _boardSize.y; y++)
-            //    if (IsRowBlocked(y))
-            //        for (int x = 0; x < _boardSize.x; x++)
-            //        {
-            //            var blockedCell = FindBlockedCell(x, y);
-            //            Destroy(blockedCell.gameObject);
-            //        }
-
-
-            for (int x = 0; x < _boardSize.x; x++)
-                for (int y = 0; y < _boardSize.y; y++)
-                {
-                    var blockedCell = FindBlockedCell(x, y);
-                    if (_boardCells[x, y] == 0 && blockedCell != null)
-                        Destroy(blockedCell.gameObject);
-                }
-        }
-
-        public void MoveBlockedCellsDown()
-        {
-            for (int x = 0; x < _boardSize.x; x++)
-                for (int y = 0; y < _boardSize.y; y++)
-                {
-                    var blockedCell = FindBlockedCell(x, y);
-
-                    if (_boardCells[x, y] == 1 && blockedCell != null)
-                    {
-
-                        //if (blockedCell.Piece.YPos == 0) continue;
-                        blockedCell.Piece.YPos -= 1;
-                        blockedCell.SetPosition();
-                    }
-                }
-
-            RearrangeRows();
         }
 
         private GameObject SpawnLineClear(int y)
@@ -450,14 +446,27 @@ namespace Assets.Scripts.Board
             for (int x = 0; x < _boardSize.x; x++)
                 _boardCells[x, y] = 0;
 
-            //FindBlockedCellObjects();
+            FindBlockedCellObjects();
 
-            //for (int x = 0; x < _boardSize.x; x++)
-            //{
-            //    var blockedCell = FindBlockedCell(x, y);
-            //    if (blockedCell != null)
-            //        blockedCell.SetVisibility(false);
-            //}
+            for (int x = 0; x < _boardSize.x; x++)
+            {
+                var blockedCell = FindBlockedCell(x, y);
+                if (blockedCell != null)
+                    blockedCell.SetVisibility(false);
+            }
+        }
+
+        private Sprite[] GetBlockedRowSprites(int y)
+        {
+            Sprite[] sprites = new Sprite[(int)_boardSize.x];
+            for (int x = 0; x < _boardSize.x; x++)
+            {
+                var blockedCell = FindBlockedCell(x, y);
+                if (blockedCell != null)
+                    sprites[x] = blockedCell.GetComponent<SpriteRenderer>().sprite;
+            }
+
+            return sprites;
         }
 
         public void Restart()
@@ -515,7 +524,6 @@ namespace Assets.Scripts.Board
 
         private void BlockTetrominoCells()
         {
-            FindBlockedCellObjects();
             foreach (var cell in _tetrominoCoords)
             {
                 var x = (int)cell.x;
