@@ -16,6 +16,8 @@ namespace Assets.Scripts.Board
         [SerializeField] private GameObject _lineClearPrefab;
         [SerializeField] private Vector2 _boardSize = new Vector2(10, 20);
         [SerializeField] private Transform _spawnPivot;
+        private Vector3 _onEdgeSpawnPosition;
+        private Vector3 _defaultSpawnPosition;
 
         [Range(0, 1)]
         [SerializeField] private float _fallSpeed = 0.1f;
@@ -63,6 +65,8 @@ namespace Assets.Scripts.Board
             _gameSession = FindObjectOfType<GameSession>();
             _score = FindObjectOfType<Score>();
             _gameSession.OnLevelChange += OnLevelUp;
+            _defaultSpawnPosition = _spawnPivot.position;
+            _onEdgeSpawnPosition = new Vector3(_spawnPivot.position.x, _spawnPivot.position.y + 1, _spawnPivot.position.z);
 
             SetDefaultSpeed();
         }
@@ -122,7 +126,19 @@ namespace Assets.Scripts.Board
 
         private void SpawnTetromino()
         {
-            var spawned = SpawnUtills.Spawn(_tetrominoPrefab, _spawnPivot.position);
+            
+            GameObject spawned;
+            if (RowHasBlocks((int)_boardSize.y - 4))
+            {
+                _spawnPivot.position = _onEdgeSpawnPosition;
+                spawned = SpawnUtills.Spawn(_tetrominoPrefab, _spawnPivot.position);
+            }
+            else
+            {
+                _spawnPivot.position = _defaultSpawnPosition;
+                spawned = SpawnUtills.Spawn(_tetrominoPrefab, _spawnPivot.position);
+            }
+
             _tetromino = spawned.GetComponent<Tetromino>();
         }
 
@@ -310,15 +326,6 @@ namespace Assets.Scripts.Board
             _clearLineCalls -= 1;
             if (_clearLineCalls != 0) return;
 
-            //for (int y = 0; y < _boardSize.y; y++)
-            //    if (IsRowBlocked(y))
-            //        for (int x = 0; x < _boardSize.x; x++)
-            //        {
-            //            var blockedCell = FindBlockedCell(x, y);
-            //            Destroy(blockedCell.gameObject);
-            //        }
-
-
             for (int x = 0; x < _boardSize.x; x++)
                 for (int y = 0; y < _boardSize.y; y++)
                 {
@@ -328,29 +335,29 @@ namespace Assets.Scripts.Board
                 }
         }
 
-        public void MoveBlockedCellsDown()
-        {
-            if (_clearLineCalls != 0) return;
-            FindBlockedCellObjects();
+        //public void MoveBlockedCellsDown()
+        //{
+        //    if (_clearLineCalls != 0) return;
+        //    FindBlockedCellObjects();
 
-            for (int x = 0; x < _boardSize.x; x++)
-                for (int y = 0; y < _boardSize.y; y++)
-                {
-                    var blockedCell = FindBlockedCell(x, y);
+        //    for (int x = 0; x < _boardSize.x; x++)
+        //        for (int y = 0; y < _boardSize.y; y++)
+        //        {
+        //            var blockedCell = FindBlockedCell(x, y);
 
-                    if (_boardCells[x, y] == 1 && blockedCell != null)
-                    {
-                        var nYPos = blockedCell.Piece.YPos - _moveCount;
-                        if (nYPos < 0) continue;
-                        blockedCell.Piece.YPos = nYPos;
-                        blockedCell.SetPosition();
-                    }
-                }
+        //            if (_boardCells[x, y] == 1 && blockedCell != null)
+        //            {
+        //                var nYPos = blockedCell.Piece.YPos - _moveCount;
+        //                if (nYPos < 0) continue;
+        //                blockedCell.Piece.YPos = nYPos;
+        //                blockedCell.SetPosition();
+        //            }
+        //        }
 
-            RearrangeRows();
-            _moveCount = 0;
-            _hardDropDisabled = false;
-        }
+        //    RearrangeRows();
+        //    _moveCount = 0;
+        //    _hardDropDisabled = false;
+        //}
 
         public void RearrangeBlockedCells()
         {
@@ -393,29 +400,29 @@ namespace Assets.Scripts.Board
             return coords;
         }
 
-        public void CreateMissingBlockedCells()
-        {
-            FindBlockedCellObjects();
-            for (int x = 0; x < _boardSize.x; x++)
-                for (int y = 0; y < _boardSize.y; y++)
-                {
-                    var blockedCell = FindBlockedCell(x, y);
+        //public void CreateMissingBlockedCells()
+        //{
+        //    FindBlockedCellObjects();
+        //    for (int x = 0; x < _boardSize.x; x++)
+        //        for (int y = 0; y < _boardSize.y; y++)
+        //        {
+        //            var blockedCell = FindBlockedCell(x, y);
 
-                    if (_boardCells[x, y] == 1 && blockedCell == null)
-                    {
-                        GameObject spawned = SpawnBlockedCell();
-                        spawned.GetComponent<SpriteRenderer>().sprite = _tetromino.Sprite;
-                        BlockedCell blocked = spawned.GetComponent<BlockedCell>();
-                        blocked.Piece.XPos = x;
-                        blocked.Piece.YPos = y;
-                        blocked.SetPosition();
-                        continue;
-                    }
+        //            if (_boardCells[x, y] == 1 && blockedCell == null)
+        //            {
+        //                GameObject spawned = SpawnBlockedCell();
+        //                spawned.GetComponent<SpriteRenderer>().sprite = _tetromino.Sprite;
+        //                BlockedCell blocked = spawned.GetComponent<BlockedCell>();
+        //                blocked.Piece.XPos = x;
+        //                blocked.Piece.YPos = y;
+        //                blocked.SetPosition();
+        //                continue;
+        //            }
 
-                    else if (_boardCells[x, y] == 1 && blockedCell != null && !blockedCell.IsVisible)
-                        blockedCell.SetVisibility(true);
-                }
-        }
+        //            else if (_boardCells[x, y] == 1 && blockedCell != null && !blockedCell.IsVisible)
+        //                blockedCell.SetVisibility(true);
+        //        }
+        //}
 
         private GameObject SpawnLineClear(int y)
         {
