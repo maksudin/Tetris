@@ -35,6 +35,7 @@ namespace Assets.Scripts.Board
         [SerializeField] public SfxUnityEvent OnGameOverSfx;
 
         private GameObject _tetrominoPrefab;
+        private GameObject _outlinePrefab;
 
         private Tetromino _tetromino;
         private Vector2[] _tetrominoCoords;
@@ -107,7 +108,10 @@ namespace Assets.Scripts.Board
             _isGameStarted = true;
 
             _tetrominoPrefab = _tGMRandomizer.GetRandomizedPrefab(isFirstTetromino: true);
+
             _nextTetrominoDisplay = FindObjectOfType<NextTetrominoDisplay>();
+
+            _tetrominoPrefab.GetComponent<Tetromino>().IsOutline = true;
 
             UpdateNextTetrominoDisplay();
             SpawnTetromino();

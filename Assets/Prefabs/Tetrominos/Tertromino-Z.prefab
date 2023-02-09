@@ -49,6 +49,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Shape: 5
   Sprite: {fileID: 21300000, guid: 666c1cc3cfae7ba43bdc3fe1047a7ab4, type: 3}
+  OutlineSprite: {fileID: 21300000, guid: 2e92e8ae02ff17a4ab8e17b020009db7, type: 3}
   Rotations:
   - Show: 0
     Pieces:

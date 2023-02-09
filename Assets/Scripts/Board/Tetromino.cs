@@ -8,9 +8,12 @@ namespace Assets.Scripts.Board
     {
         public Shape Shape;
         public Sprite Sprite;
+        public Sprite OutlineSprite;
         public Rotations[] Rotations;
         public Piece[] Pieces;
         private Transform[] _piecesTransform;
+
+        public bool IsOutline;
 
         private void Awake()
         {
@@ -23,7 +26,10 @@ namespace Assets.Scripts.Board
         {
             var spriteRenders = GetComponentsInChildren<SpriteRenderer>();
             foreach (var render in spriteRenders)
-                render.sprite = Sprite;
+                if (IsOutline)
+                    render.sprite = OutlineSprite;
+                else
+                    render.sprite = Sprite;
         }
 
         public void RearrangePieces()
