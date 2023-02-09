@@ -39,6 +39,7 @@ namespace Assets.Scripts.Board
 
         private Vector2 _direction;
         private int[,] _boardCells;
+        private Sprite[,] _boardCellsSprites;
         private int _rotationCount;
 
         private bool _isHardDrop;
@@ -57,6 +58,7 @@ namespace Assets.Scripts.Board
         private void Start()
         {
             _boardCells = new int[(int)_boardSize.x, (int)_boardSize.y];
+            _boardCellsSprites = new Sprite[(int)_boardSize.x, (int)_boardSize.y];
             _tGMRandomizer = GetComponent<TGMRandomizer>();
             _gameSession = FindObjectOfType<GameSession>();
             _score = FindObjectOfType<Score>();
@@ -289,6 +291,7 @@ namespace Assets.Scripts.Board
                 if (IsRowEmpty(y) && RowHasBlocks(y + 1))
                 {
                     SwapRows(y, y + 1);
+                    SwapRowsSprites(y, y + 1);
                     RearrangeRows();
                     break;
                 }
@@ -361,6 +364,7 @@ namespace Assets.Scripts.Board
 
                 freeBlockedCells[i].Piece.XPos = (int)boardCellCoords[i].x;
                 freeBlockedCells[i].Piece.YPos = (int)boardCellCoords[i].y;
+                freeBlockedCells[i].SetSprite(_boardCellsSprites[(int)boardCellCoords[i].x, (int)boardCellCoords[i].y]);
                 freeBlockedCells[i].SetPosition();
             }
             
@@ -437,6 +441,25 @@ namespace Assets.Scripts.Board
                 _boardCells[x, row1] = row2Vals[x];
                 _boardCells[x, row2] = row1Vals[x];
             }
+        }
+
+        private void SwapRowsSprites(int row1, int row2)
+        {
+            Sprite[] row1Sprites = new Sprite[(int)_boardSize.x];
+            Sprite[] row2Sprites = new Sprite[(int)_boardSize.x];
+
+            for (int x = 0; x < _boardSize.x; x++)
+            {
+                row1Sprites[x] = _boardCellsSprites[x, row1];
+                row2Sprites[x] = _boardCellsSprites[x, row2];
+            }
+
+            for (int x = 0; x < _boardSize.x; x++)
+            {
+                _boardCellsSprites[x, row1] = row2Sprites[x];
+                _boardCellsSprites[x, row2] = row1Sprites[x];
+            }
+
         }
 
         private void MoveRowTo(int fromIndex, int toIndex)
@@ -580,6 +603,8 @@ namespace Assets.Scripts.Board
 
                 GameObject spawned = SpawnBlockedCell();
                 spawned.GetComponent<SpriteRenderer>().sprite = _tetromino.Sprite;
+                _boardCellsSprites[x, y] = _tetromino.Sprite;
+
                 BlockedCell blocked = spawned.GetComponent<BlockedCell>();
                 blocked.Piece.XPos = x;
                 blocked.Piece.YPos = y;
