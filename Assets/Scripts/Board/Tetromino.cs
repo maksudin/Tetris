@@ -22,11 +22,11 @@ namespace Assets.Scripts.Board
             RearrangePieces();
         }
 
-        private void ApplySprites()
+        public void ApplySprites(bool isOutline = false)
         {
             var spriteRenders = GetComponentsInChildren<SpriteRenderer>();
             foreach (var render in spriteRenders)
-                if (IsOutline)
+                if (isOutline)
                     render.sprite = OutlineSprite;
                 else
                     render.sprite = Sprite;
