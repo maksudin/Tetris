@@ -48,6 +48,7 @@ namespace Assets.Scripts.Board
         private Sprite[,] _boardCellsSprites;
 
         private int _rotationCount;
+        private int _outlineRotationCount;
         private int _linesCleared;
         private int _clearLineCalls;
 
@@ -202,6 +203,17 @@ namespace Assets.Scripts.Board
             Vector3 tetrominoCoord = new Vector3(pos.x - 0.5f, pos.y - 0.5f, pos.z); 
             SetTetrominoCoords(tetrominoCoord);
             _tetromino.RearrangePieces();
+
+            RotateOutline();
+        }
+
+        private void RotateOutline()
+        {
+            var rotationsLen = _tetromino.Rotations.Length;
+
+            _tetrominoOutline.Pieces = _tetromino.Rotations[_rotationCount % rotationsLen].Pieces;
+            _tetrominoOutline.RearrangePieces();
+            ResetOutlinePosition();
         }
 
         public void Move(Vector2 direction)
@@ -219,9 +231,6 @@ namespace Assets.Scripts.Board
         {
             if (_tetromino == null) return;
             var boardPos = _tetromino.transform.position;
-
-            if (direction.x != 0)
-                Debug.Log("HI");
 
             foreach (var coord in _tetrominoCoords)
             {
@@ -328,6 +337,7 @@ namespace Assets.Scripts.Board
             OnPieceDestroyed?.Invoke(SfxType.Blocked);
 
             _rotationCount = 0;
+            _outlineRotationCount = 0;
             _isHardDrop = false;
             _linesCleared = 0;
 
