@@ -246,6 +246,12 @@ namespace Assets.Scripts.Board
                     return;
                 }
 
+                if (CheckUpperRowReached())
+                {
+                    PrepareNextTetromino();
+                    return;
+                }
+
                 var isCellUnderTetromino = direction.x == 0 && direction.y == -1;
 
                 if (IsCellBlocked(coordX: X, coordY: Y) && isCellUnderTetromino)
@@ -662,7 +668,7 @@ namespace Assets.Scripts.Board
             {
                 var x = (int)cell.x;
                 var y = (int)cell.y;
-                if (x > _boardSize.x || y > _boardSize.y) 
+                if (x > _boardSize.x || y > _boardSize.y - 1) 
                     return;
                 _boardCells[x, y] = 1;
 
