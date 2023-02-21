@@ -18,10 +18,10 @@ namespace Assets.Scripts.Board
         [SerializeField] private Transform _spawnPivot;
         private Vector3 _onEdgeSpawnPosition;
         private Vector3 _defaultSpawnPosition;
+        private Vector3 _outlinePos;
 
         [Range(0, 1)]
         [SerializeField] private float _fallSpeed = 0.1f;
-
         [SerializeField] private float _softDropMultiplier = 1f;
         [SerializeField] private bool _fallEnabled;
         private float _nextFallTime = 0.0f;
@@ -39,13 +39,17 @@ namespace Assets.Scripts.Board
 
         private Tetromino _tetromino;
         private Tetromino _tetrominoOutline;
+
         private Vector2[] _tetrominoCoords;
         private Vector2[] _outlineCoords;
-
         private Vector2 _direction;
+
         private int[,] _boardCells;
         private Sprite[,] _boardCellsSprites;
+
         private int _rotationCount;
+        private int _linesCleared;
+        private int _clearLineCalls;
 
         private bool _isHardDrop;
         private bool _isPaused;
@@ -76,6 +80,7 @@ namespace Assets.Scripts.Board
 
         private void Update()
         {
+            UpdateOutlinePosition();
             if (Time.time > _nextFallTime)
             {
                 _nextFallTime += _fallSpeed * _softDropMultiplier;
@@ -117,6 +122,22 @@ namespace Assets.Scripts.Board
             SpawnOutline();
             SetTetrominoCoords(_spawnPivot.position);
             SetOutlineCoords(_spawnPivot.position);
+            UpdateOutlinePosition();
+        }
+
+        public void Restart()
+        {
+            RemoveAllBlockedCells();
+
+            _isHardDrop = false;
+
+            _tgmRandomizer.ResetHistory();
+            if (_tetromino != null)
+                Destroy(_tetromino.gameObject);
+            if (_tetrominoOutline != null)
+                Destroy(_tetrominoOutline.gameObject);
+
+            StartGame();
         }
 
         private void FindBlockedCellObjects()
@@ -139,13 +160,6 @@ namespace Assets.Scripts.Board
 
             spawned = SpawnUtills.Spawn(_tetrominoPrefab, _spawnPivot.position);
             _tetromino = spawned.GetComponent<Tetromino>();
-        }
-
-        private void SpawnOutline()
-        {
-            var spawned = SpawnUtills.Spawn(_tetrominoPrefab, _spawnPivot.position);
-            _tetrominoOutline = spawned.GetComponent<Tetromino>();
-            _tetrominoOutline.ApplySprites(isOutline: true);
         }
 
         public void HardDrop()
@@ -187,7 +201,6 @@ namespace Assets.Scripts.Board
             Vector3 pos = _tetromino.transform.position;
             Vector3 tetrominoCoord = new Vector3(pos.x - 0.5f, pos.y - 0.5f, pos.z); 
             SetTetrominoCoords(tetrominoCoord);
-            UpdateOutlinePosition();
             _tetromino.RearrangePieces();
         }
 
@@ -206,6 +219,9 @@ namespace Assets.Scripts.Board
         {
             if (_tetromino == null) return;
             var boardPos = _tetromino.transform.position;
+
+            if (direction.x != 0)
+                Debug.Log("HI");
 
             foreach (var coord in _tetrominoCoords)
             {
@@ -240,44 +256,61 @@ namespace Assets.Scripts.Board
 
             _tetromino.transform.position = new Vector3(boardPos.x + direction.x, boardPos.y + direction.y, boardPos.z);
 
-            UpdateOutlinePosition();
-
             if (_isHardDrop)
                 Movement(new Vector2(0, -1));
+        }
+
+        private void SpawnOutline()
+        {
+            var spawned = SpawnUtills.Spawn(_tetrominoPrefab, _spawnPivot.position);
+            _tetrominoOutline = spawned.GetComponent<Tetromino>();
+            _tetrominoOutline.ApplySprites(isOutline: true);
+            ResetOutlinePosition();
+        }
+
+        private void ResetOutlinePosition()
+        {
+            Vector3 pos = _tetromino.transform.position;
+            Vector3 tetrominoCoord = new Vector3((float)Math.Floor(pos.x), (float)Math.Floor(pos.y), pos.z);
+            Vector3 outlineCoord = new Vector3(tetrominoCoord.x + 0.5f, tetrominoCoord.y + 0.5f, tetrominoCoord.z);
+
+            SetOutlineCoords(tetrominoCoord);
+            _outlinePos = outlineCoord;
         }
 
         private void UpdateOutlinePosition()
         {
             if (_tetrominoOutline == null) return;
-            var boardPos = _spawnPivot.transform.position;
-            
             var direction = new Vector2(0, -1);
+            var tetrominoPos = _tetromino.transform.position;
 
-            foreach (var coord in _outlineCoords)
+            if (tetrominoPos.x != _tetrominoOutline.transform.position.x)
+                ResetOutlinePosition();
+
+            while (true)
             {
-                var X = coord.x + direction.x;
-                var Y = coord.y + direction.y;
-                if (IsCellOutOfBounds(coordX: X))
-                    return;
-                if (IsBottomReached(coordY: Y))
-                    return;
-                if (IsCellBlocked(coordX: X, coordY: Y))
-                    return;
+                foreach (var coord in _outlineCoords)
+                {
+                    var X = coord.x + direction.x;
+                    var Y = coord.y + direction.y;
+                    if (IsCellOutOfBounds(coordX: X))
+                        return;
+                    if (IsBottomReached(coordY: Y) || IsCellBlocked(coordX: X, coordY: Y))
+                        return;
+                }
+
+                for (int i = 0; i < _outlineCoords.Length; i++)
+                {
+                    _outlineCoords[i].x += direction.x;
+                    _outlineCoords[i].y += direction.y;
+                }
+
+                var newOutlinePos = new Vector3(_outlinePos.x, _outlinePos.y + direction.y, _outlinePos.z);
+
+                _tetrominoOutline.transform.position = newOutlinePos;
+                _outlinePos = newOutlinePos;
             }
-
-            for (int i = 0; i < _outlineCoords.Length; i++)
-            {
-                _outlineCoords[i].x += direction.x;
-                _outlineCoords[i].y += direction.y;
-            }
-
-            _tetrominoOutline.transform.position = new Vector3(boardPos.x + direction.x, boardPos.y + direction.y, boardPos.z);
-
-            //UpdateOutlinePosition();
         }
-
-        private int _linesCleared;
-        private int _clearLineCalls;
         
         private void PrepareNextTetromino()
         {
@@ -580,25 +613,6 @@ namespace Assets.Scripts.Board
             return sprites;
         }
 
-        public void Restart()
-        {
-            RemoveAllBlockedCells();
-            
-            _isHardDrop = false;
-
-            _tgmRandomizer.ResetHistory();
-            if (_tetromino != null) 
-                Destroy(_tetromino.gameObject);
-
-            _tetrominoPrefab = _tgmRandomizer.GetRandomizedPrefab(isFirstTetromino: true);
-
-            UpdateNextTetrominoDisplay();
-            SpawnTetromino();
-            SetTetrominoCoords(_spawnPivot.position);
-
-            OnRestart?.Invoke();
-        }
-
         private void RemoveAllBlockedCells()
         {
             for (int x = 0; x < _boardSize.x; x++)
@@ -638,6 +652,8 @@ namespace Assets.Scripts.Board
             {
                 var x = (int)cell.x;
                 var y = (int)cell.y;
+                if (x > _boardSize.x || y > _boardSize.y) 
+                    return;
                 _boardCells[x, y] = 1;
 
                 GameObject spawned = SpawnBlockedCell();
@@ -732,13 +748,13 @@ namespace Assets.Scripts.Board
 
             _outlineCoords = new Vector2[4]
             {
-                new Vector2(_tetrominoOutline.Pieces[0].XPos + outlineCenter.x, _tetrominoOutline.Pieces[0].YPos + outlineCenter.y),
-                new Vector2(_tetrominoOutline.Pieces[1].XPos + outlineCenter.x, _tetrominoOutline.Pieces[1].YPos + outlineCenter.y),
-                new Vector2(_tetrominoOutline.Pieces[2].XPos + outlineCenter.x, _tetrominoOutline.Pieces[2].YPos + outlineCenter.y),
-                new Vector2(_tetrominoOutline.Pieces[3].XPos + outlineCenter.x, _tetrominoOutline.Pieces[3].YPos + outlineCenter.y)
+                new Vector2(_tetromino.Pieces[0].XPos + outlineCenter.x, _tetromino.Pieces[0].YPos + outlineCenter.y),
+                new Vector2(_tetromino.Pieces[1].XPos + outlineCenter.x, _tetromino.Pieces[1].YPos + outlineCenter.y),
+                new Vector2(_tetromino.Pieces[2].XPos + outlineCenter.x, _tetromino.Pieces[2].YPos + outlineCenter.y),
+                new Vector2(_tetromino.Pieces[3].XPos + outlineCenter.x, _tetromino.Pieces[3].YPos + outlineCenter.y)
             };
 
-            SetTetrominoPosition(outlineCenter);
+            SetOutlinePosition(outlineCenter);
         }
 
         private void SetTetrominoPosition(Vector3 center)
@@ -746,6 +762,15 @@ namespace Assets.Scripts.Board
             _tetromino.transform.position = new Vector3(
                 _tetromino.Pieces[0].XPos + center.x + 0.5f,
                 _tetromino.Pieces[0].YPos + center.y + 0.5f,
+                center.z
+            );
+        }
+
+        private void SetOutlinePosition(Vector3 center)
+        {
+            _tetrominoOutline.transform.position = new Vector3(
+                _tetrominoOutline.Pieces[0].XPos + center.x + 0.5f,
+                _tetrominoOutline.Pieces[0].YPos + center.y + 0.5f,
                 center.z
             );
         }
