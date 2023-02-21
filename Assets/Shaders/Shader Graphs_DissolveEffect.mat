@@ -44,7 +44,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _Cutoff_Height: 0.55
+    - _Cutoff_Height: 0.4
     - _Glow_Width: 3.03
     - _Noise_Scale: 652.52
     - _Noise_Strength: 0.62

@@ -35,8 +35,6 @@ namespace Assets.Scripts.Board
         [SerializeField] public SfxUnityEvent OnGameOverSfx;
 
         private GameObject _tetrominoPrefab;
-        private GameObject _outlinePrefab;
-
         private Tetromino _tetromino;
         private Tetromino _tetrominoOutline;
 
@@ -48,7 +46,6 @@ namespace Assets.Scripts.Board
         private Sprite[,] _boardCellsSprites;
 
         private int _rotationCount;
-        private int _outlineRotationCount;
         private int _linesCleared;
         private int _clearLineCalls;
 
@@ -343,7 +340,6 @@ namespace Assets.Scripts.Board
             OnPieceDestroyed?.Invoke(SfxType.Blocked);
 
             _rotationCount = 0;
-            _outlineRotationCount = 0;
             _isHardDrop = false;
             _linesCleared = 0;
 
@@ -680,6 +676,7 @@ namespace Assets.Scripts.Board
                 blocked.Piece.XPos = x;
                 blocked.Piece.YPos = y;
                 spawned.transform.position = new Vector3(x + 0.5f, y + 0.5f, transform.position.z);
+                blocked.PlayAnimation();
                 continue;
             }
         }

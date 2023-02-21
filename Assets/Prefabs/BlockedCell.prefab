@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1428605465579214399}
   - component: {fileID: 6674510499739036563}
+  - component: {fileID: 7502974850000627514}
   - component: {fileID: 3619902777270006835}
   m_Layer: 0
   m_Name: BlockedCell
@@ -73,7 +74,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 10
   m_Sprite: {fileID: 21300000, guid: 700fe841f80e478409e0d7f8f578cf67, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -83,6 +84,25 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!95 &7502974850000627514
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 632761194083501790}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 8e62ee7a1d5a64448ad565d4e4700ed2, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &3619902777270006835
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -98,3 +118,4 @@ MonoBehaviour:
   Piece:
     XPos: 25
     YPos: 25
+  _animator: {fileID: 7502974850000627514}
