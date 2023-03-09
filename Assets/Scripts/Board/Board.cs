@@ -109,8 +109,6 @@ namespace Assets.Scripts.Board
 
         public void StartGame()
         {
-            _gameSession.ResetLevel();
-            _score.ResetScore();
             _isGameOver = false;
             _isGameStarted = true;
 
@@ -137,6 +135,7 @@ namespace Assets.Scripts.Board
             if (_tetrominoOutline != null)
                 Destroy(_tetrominoOutline.gameObject);
 
+            OnRestart?.Invoke();
             StartGame();
         }
 
