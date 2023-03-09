@@ -109,6 +109,8 @@ namespace Assets.Scripts.Board
 
         public void StartGame()
         {
+            _gameSession.ResetLevel();
+            _score.ResetScore();
             _isGameOver = false;
             _isGameStarted = true;
 

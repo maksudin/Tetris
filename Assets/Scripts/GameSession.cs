@@ -1,6 +1,5 @@
 ﻿using System;
 using Assets.Scripts.Model;
-using Assets.Scripts.Utils;
 using UnityEngine;
 
 namespace Assets.Scripts
@@ -9,12 +8,12 @@ namespace Assets.Scripts
     {
         [SerializeField] public Score Score;
         public int CurrentLevel;
-        private int maxLevel;
         public event Action OnLevelChange;
+        private int _maxLevel;
 
         private void Awake()
         {
-            maxLevel = DefsFacade.I.LevelDef.MaximumLevel;
+            _maxLevel = DefsFacade.I.LevelDef.MaximumLevel;
         }
 
         private void Start()
@@ -44,7 +43,7 @@ namespace Assets.Scripts
 
         public void LevelUp()
         {
-            if (CurrentLevel + 1 > maxLevel)
+            if (CurrentLevel + 1 > _maxLevel)
                 return;
 
             CurrentLevel++;
