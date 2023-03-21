@@ -12,48 +12,32 @@ namespace Assets.Scripts.Board
 
     public class Board : MonoBehaviour
     {
-        [SerializeField] private GameObject _blockedCellPrefab;
-        [SerializeField] private GameObject _lineClearPrefab;
+        [SerializeField] private GameObject _blockedCellPrefab, _lineClearPrefab;
         [SerializeField] private Vector2 _boardSize = new Vector2(10, 20);
         [SerializeField] private Transform _spawnPivot;
-        private Vector3 _onEdgeSpawnPosition;
-        private Vector3 _defaultSpawnPosition;
-        private Vector3 _outlinePos;
+        private Vector3 _onEdgeSpawnPosition, _defaultSpawnPosition, _outlinePos;
 
-        [Range(0, 1)]
-        [SerializeField] private float _fallSpeed = 0.1f;
-        [SerializeField] private float _softDropMultiplier = 1f;
+        [SerializeField, Range(0, 1)] private float _fallSpeed = 0.1f,
+                                       _softDropMultiplier = 1f;
+
         [SerializeField] private bool _fallEnabled;
         private float _nextFallTime = 0.0f;
 
-        [SerializeField] public UnityEvent OnGameOver;
-        [SerializeField] public UnityEvent OnRestart;
-        [SerializeField] public UnityEvent OnPause;
-
-        [SerializeField] public SfxUnityEvent OnLinesCleared;
-        [SerializeField] public SfxUnityEvent OnPieceDestroyed;
-        [SerializeField] public SfxUnityEvent OnGameOverSfx;
+        [SerializeField] public UnityEvent OnGameOver, OnRestart, OnPause;
+        [SerializeField] public SfxUnityEvent OnLinesCleared, OnPieceDestroyed, OnGameOverSfx;
 
         private GameObject _tetrominoPrefab;
-        private Tetromino _tetromino;
-        private Tetromino _tetrominoOutline;
-
-        private Vector2[] _tetrominoCoords;
-        private Vector2[] _outlineCoords;
+        private Tetromino _tetromino, _tetrominoOutline;
+        private Vector2[] _tetrominoCoords,_outlineCoords;
         private Vector2 _direction;
 
         private int[,] _boardCells;
         private Sprite[,] _boardCellsSprites;
 
-        private int _rotationCount;
-        private int _linesCleared;
-        private int _clearLineCalls;
+        private int _rotationCount, _linesCleared, _clearLineCalls;
 
-        private bool _isHardDrop;
-        private bool _isPaused;
-        private bool _isGameOver;
-        private bool _isGameStarted;
-        private bool _hardDropDisabled;
+        private bool _isHardDrop, _isPaused, _isGameOver,
+                     _isGameStarted, _hardDropDisabled;
 
         private BlockedCell[] _blockedCells;
         private TGMRandomizer _tgmRandomizer;
@@ -87,10 +71,7 @@ namespace Assets.Scripts.Board
             }
         }
 
-        private void OnDestroy()
-        {
-            _gameSession.OnLevelChange -= OnLevelUp;
-        }
+        private void OnDestroy() => _gameSession.OnLevelChange -= OnLevelUp;
 
         public void PauseGame()
         {
@@ -139,15 +120,11 @@ namespace Assets.Scripts.Board
             StartGame();
         }
 
-        private void FindBlockedCellObjects()
-        {
+        private void FindBlockedCellObjects() => 
             _blockedCells = FindObjectsOfType<BlockedCell>();
-        }
 
-        private GameObject SpawnBlockedCell()
-        {
-            return SpawnUtills.Spawn(_blockedCellPrefab, Vector3.zero);
-        }
+        private GameObject SpawnBlockedCell() =>
+            SpawnUtills.Spawn(_blockedCellPrefab, Vector3.zero);
 
         private void SpawnTetromino()
         {
@@ -415,30 +392,6 @@ namespace Assets.Scripts.Board
                 }
         }
 
-        //public void MoveBlockedCellsDown()
-        //{
-        //    if (_clearLineCalls != 0) return;
-        //    FindBlockedCellObjects();
-
-        //    for (int x = 0; x < _boardSize.x; x++)
-        //        for (int y = 0; y < _boardSize.y; y++)
-        //        {
-        //            var blockedCell = FindBlockedCell(x, y);
-
-        //            if (_boardCells[x, y] == 1 && blockedCell != null)
-        //            {
-        //                var nYPos = blockedCell.Piece.YPos - _moveCount;
-        //                if (nYPos < 0) continue;
-        //                blockedCell.Piece.YPos = nYPos;
-        //                blockedCell.SetPosition();
-        //            }
-        //        }
-
-        //    RearrangeRows();
-        //    _moveCount = 0;
-        //    _hardDropDisabled = false;
-        //}
-
         public void RearrangeBlockedCells()
         {
             if (_clearLineCalls != 0) return;
@@ -478,30 +431,6 @@ namespace Assets.Scripts.Board
 
             return coords;
         }
-
-        //public void CreateMissingBlockedCells()
-        //{
-        //    FindBlockedCellObjects();
-        //    for (int x = 0; x < _boardSize.x; x++)
-        //        for (int y = 0; y < _boardSize.y; y++)
-        //        {
-        //            var blockedCell = FindBlockedCell(x, y);
-
-        //            if (_boardCells[x, y] == 1 && blockedCell == null)
-        //            {
-        //                GameObject spawned = SpawnBlockedCell();
-        //                spawned.GetComponent<SpriteRenderer>().sprite = _tetromino.Sprite;
-        //                BlockedCell blocked = spawned.GetComponent<BlockedCell>();
-        //                blocked.Piece.XPos = x;
-        //                blocked.Piece.YPos = y;
-        //                blocked.SetPosition();
-        //                continue;
-        //            }
-
-        //            else if (_boardCells[x, y] == 1 && blockedCell != null && !blockedCell.IsVisible)
-        //                blockedCell.SetVisibility(true);
-        //        }
-        //}
 
         private GameObject SpawnLineClear(int y)
         {
@@ -546,27 +475,6 @@ namespace Assets.Scripts.Board
                 _boardCellsSprites[x, row2] = row1Sprites[x];
             }
 
-        }
-
-        private void MoveRowTo(int fromIndex, int toIndex)
-        {
-            int[] row = GetBlockedRow(fromIndex);
-            ReplaceRowWith(replaceIndex: toIndex, row);
-            RemoveBlockedRow(fromIndex);
-        }
-
-        private void ReplaceRowWith(int replaceIndex, int[] rowVals)
-        {
-            for (int x = 0; x < _boardSize.x; x++)
-                _boardCells[x, replaceIndex] = rowVals[x];
-        }
-
-        private int[] GetBlockedRow(int y)
-        {
-            int[] blockedRow = new int[(int)_boardSize.x];
-            for (int x = 0; x < _boardSize.x; x++)
-                blockedRow[x] = _boardCells[x, y];
-            return blockedRow;
         }
 
         private bool RowHasBlocks(int y)
@@ -682,20 +590,13 @@ namespace Assets.Scripts.Board
             }
         }
 
-        private bool IsCellOutOfBounds(float coordX)
-        {
-            return coordX > _boardSize.x - 1 || coordX < 0;
-        }
+        private bool IsCellOutOfBounds(float coordX) =>
+            coordX > _boardSize.x - 1 || coordX < 0;
 
-        private bool IsBottomReached(float coordY)
-        {
-            return coordY < 0;
-        }
+        private bool IsBottomReached(float coordY) => coordY < 0;
 
-        private bool IsCellBlocked(float coordX, float coordY)
-        {
-            return _boardCells[(int)coordX, (int)coordY] == 1;
-        }
+        private bool IsCellBlocked(float coordX, float coordY) =>
+            _boardCells[(int)coordX, (int)coordY] == 1;
 
 #if UNITY_EDITOR
         private void OnDrawGizmos()
@@ -798,12 +699,7 @@ namespace Assets.Scripts.Board
 #endif
         }
 
-        private void OnLevelUp()
-        {
-            ChangeSpeed();
-            //var clip = SfxUtils.GetRandomSfxOfType(SfxType.LevelUp);
-            //SfxUtils.PlaySfx(clip);
-        }
+        private void OnLevelUp() => ChangeSpeed();
 
         private void ChangeSpeed()
         {
@@ -817,9 +713,6 @@ namespace Assets.Scripts.Board
             _fallSpeed = defSpeed;
         }
 
-        public void EnableControls()
-        {
-            ControlsUtils.EnableInput();
-        }
+        public void EnableControls() => ControlsUtils.EnableInput();
     }
 }

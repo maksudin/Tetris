@@ -9,15 +9,11 @@ namespace Assets.Scripts
         [SerializeField] private GameObject _prefab;
 
         [ContextMenu("Spawn")]
-        public void Spawn()
-        {
-            SpawnInstance();
-        }
+        public void Spawn() => SpawnInstance();
 
         public GameObject SpawnInstance()
         {
             var instance = SpawnUtills.Spawn(_prefab, _target.position);
-
             var scale = _target.lossyScale;
             instance.transform.localScale = scale;
             instance.SetActive(true);
@@ -47,10 +43,7 @@ namespace Assets.Scripts
             }
         }
 
-        public void SetPrefub(GameObject prefab)
-        {
-            _prefab = prefab;
-        }
+        public void SetPrefub(GameObject prefab) => _prefab = prefab;
     }
 }
 

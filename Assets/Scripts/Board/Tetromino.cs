@@ -7,8 +7,7 @@ namespace Assets.Scripts.Board
     public class Tetromino : MonoBehaviour
     {
         public Shape Shape;
-        public Sprite Sprite;
-        public Sprite OutlineSprite;
+        public Sprite Sprite, OutlineSprite;
         public Rotations[] Rotations;
         public Piece[] Pieces;
         private Transform[] _piecesTransform;

@@ -11,10 +11,7 @@ namespace Assets.Scripts
         private float _moveDistance;
         private bool _positionReached = true;
 
-        private void Awake()
-        {
-            _camera = GetComponent<Camera>();
-        }
+        private void Awake() => _camera = GetComponent<Camera>();
 
         private void Update()
         {

@@ -15,19 +15,10 @@ namespace Assets.Scripts.UI
             _gameSession.OnLevelChange += PlayAnimation;
         }
 
-        public void PlayAnimation()
-        {
-            _animator.SetTrigger("UpdateLevel");
-        }
+        public void PlayAnimation() => _animator.SetTrigger("UpdateLevel");
 
-        public void UpdateLevel()
-        {
-            _levelText.text = _gameSession.CurrentLevel.ToString();
-        }
+        public void UpdateLevel() => _levelText.text = _gameSession.CurrentLevel.ToString();
 
-        private void OnDestroy()
-        {
-            _gameSession.OnLevelChange -= UpdateLevel;
-        }
+        private void OnDestroy() => _gameSession.OnLevelChange -= UpdateLevel;
     }
 }

@@ -6,8 +6,7 @@ namespace Assets.Scripts
 {
     public class PlayMusic : MonoBehaviour
     {
-        private AudioSource _musicSource;
-        private AudioSource _SfxSource;
+        private AudioSource _musicSource, _SfxSource;
 
         private void Start()
         {

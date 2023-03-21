@@ -11,10 +11,8 @@ namespace Assets.Scripts
         public event Action OnLevelChange;
         private int _maxLevel;
 
-        private void Awake()
-        {
+        private void Awake() =>
             _maxLevel = DefsFacade.I.LevelDef.MaximumLevel;
-        }
 
         private void Start()
         {
@@ -23,10 +21,8 @@ namespace Assets.Scripts
             OnLevelChange?.Invoke();
         }
 
-        private void OnDestroy()
-        {
+        private void OnDestroy() =>
             Score.OnScoreChange -= CheckLevelThreshold;
-        }
 
         public void ResetLevel()
         {

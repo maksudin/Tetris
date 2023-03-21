@@ -14,14 +14,8 @@ namespace Assets.Scripts.UI
             _score.OnScoreChange += UpdateScore;
         }
 
-        private void UpdateScore()
-        {
-            _scoreText.text =  _score.Value.ToString();
-        }
+        private void UpdateScore() => _scoreText.text = _score.Value.ToString();
 
-        private void OnDestroy()
-        {
-            _score.OnScoreChange -= UpdateScore;
-        }
+        private void OnDestroy() => _score.OnScoreChange -= UpdateScore;
     }
 }
