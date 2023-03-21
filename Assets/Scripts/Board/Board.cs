@@ -15,34 +15,30 @@ namespace Assets.Scripts.Board
         [SerializeField] private GameObject _blockedCellPrefab, _lineClearPrefab;
         [SerializeField] private Vector2 _boardSize = new Vector2(10, 20);
         [SerializeField] private Transform _spawnPivot;
-        private Vector3 _onEdgeSpawnPosition, _defaultSpawnPosition, _outlinePos;
-
-        [SerializeField, Range(0, 1)] private float _fallSpeed = 0.1f,
-                                       _softDropMultiplier = 1f;
+        [SerializeField, Range(0, 1)] 
+        private float _fallSpeed = 0.1f,
+                      _softDropMultiplier = 1f;
 
         [SerializeField] private bool _fallEnabled;
-        private float _nextFallTime = 0.0f;
-
         [SerializeField] public UnityEvent OnGameOver, OnRestart, OnPause;
         [SerializeField] public SfxUnityEvent OnLinesCleared, OnPieceDestroyed, OnGameOverSfx;
 
+        private Vector3 _onEdgeSpawnPosition, _defaultSpawnPosition, _outlinePos;
         private GameObject _tetrominoPrefab;
         private Tetromino _tetromino, _tetrominoOutline;
-        private Vector2[] _tetrominoCoords,_outlineCoords;
+        private Vector2[] _tetrominoCoords, _outlineCoords;
         private Vector2 _direction;
-
         private int[,] _boardCells;
         private Sprite[,] _boardCellsSprites;
 
         private int _rotationCount, _linesCleared, _clearLineCalls;
-
         private bool _isHardDrop, _isPaused, _isGameOver,
                      _isGameStarted, _hardDropDisabled;
+        private float _nextFallTime = 0.0f;
 
         private BlockedCell[] _blockedCells;
         private TGMRandomizer _tgmRandomizer;
         private NextTetrominoDisplay _nextTetrominoDisplay;
-
         private GameSession _gameSession;
         private Score _score;
         
@@ -66,7 +62,8 @@ namespace Assets.Scripts.Board
             if (Time.time > _nextFallTime)
             {
                 _nextFallTime += _fallSpeed * _softDropMultiplier;
-                if (_isPaused || !_isGameStarted || !_fallEnabled) return;
+                if (_isPaused || !_isGameStarted || !_fallEnabled) 
+                    return;
                 Movement(new Vector2(0, -1));
             }
         }
@@ -75,7 +72,8 @@ namespace Assets.Scripts.Board
 
         public void PauseGame()
         {
-            if (_isGameOver || !_isGameStarted) return; 
+            if (_isGameOver || !_isGameStarted) 
+                return; 
 
             _isPaused = true;
             ControlsUtils.DisableInput();
