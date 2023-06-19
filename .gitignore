@@ -7,6 +7,8 @@
 /build
 /Temp/
 /Assets/VSCode*
+/Assets/Audio/Music
+/Assets/Resources/Music
 /obj/
 /out
 /.vscode/

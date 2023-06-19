@@ -4,9 +4,9 @@ namespace Assets.Scripts.Utils
 {
     public class SpawnUtills
     {
-        private const string ContainerName = "###SPAWNED###";
+        private const string _containerName = "###SPAWNED###";
 
-        public static GameObject Spawn(GameObject prefab, Vector3 position, string containerName = ContainerName)
+        public static GameObject Spawn(GameObject prefab, Vector3 position, string containerName = _containerName)
         {
             var container = GameObject.Find(containerName);
             if (container == null)

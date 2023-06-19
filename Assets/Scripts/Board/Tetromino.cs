@@ -7,10 +7,12 @@ namespace Assets.Scripts.Board
     public class Tetromino : MonoBehaviour
     {
         public Shape Shape;
-        public Sprite Sprite;
+        public Sprite Sprite, OutlineSprite;
         public Rotations[] Rotations;
         public Piece[] Pieces;
         private Transform[] _piecesTransform;
+
+        public bool IsOutline;
 
         private void Awake()
         {
@@ -19,11 +21,14 @@ namespace Assets.Scripts.Board
             RearrangePieces();
         }
 
-        private void ApplySprites()
+        public void ApplySprites(bool isOutline = false)
         {
             var spriteRenders = GetComponentsInChildren<SpriteRenderer>();
             foreach (var render in spriteRenders)
-                render.sprite = Sprite;
+                if (isOutline)
+                    render.sprite = OutlineSprite;
+                else
+                    render.sprite = Sprite;
         }
 
         public void RearrangePieces()

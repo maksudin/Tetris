@@ -6,22 +6,19 @@ namespace Assets.Scripts.UI
     public class LevelWidget : MonoBehaviour
     {
         [SerializeField] Text _levelText;
+        [SerializeField] private Animator _animator;
         private GameSession _gameSession;
 
         private void Start()
         {
             _gameSession = FindObjectOfType<GameSession>();
-            _gameSession.OnLevelChange += UpdateLevel;
+            _gameSession.OnLevelChange += PlayAnimation;
         }
 
-        private void UpdateLevel()
-        {
-            _levelText.text = _gameSession.CurrentLevel.ToString();
-        }
+        public void PlayAnimation() => _animator.SetTrigger("UpdateLevel");
 
-        private void OnDestroy()
-        {
-            _gameSession.OnLevelChange -= UpdateLevel;
-        }
+        public void UpdateLevel() => _levelText.text = _gameSession.CurrentLevel.ToString();
+
+        private void OnDestroy() => _gameSession.OnLevelChange -= UpdateLevel;
     }
 }

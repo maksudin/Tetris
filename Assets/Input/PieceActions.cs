@@ -86,17 +86,6 @@ public partial class @PieceActions : IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""up"",
-                    ""id"": ""23adf809-9b97-4d1e-b333-df3589247ea1"",
-                    ""path"": ""<Keyboard>/upArrow"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Horizontal Movement"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
                     ""name"": ""down"",
                     ""id"": ""71c1c442-1f59-4b11-8709-4edf57fe36a3"",
                     ""path"": ""<Keyboard>/downArrow"",
