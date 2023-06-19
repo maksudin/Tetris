@@ -9,10 +9,7 @@ namespace Assets.Scripts.Board
         [SerializeField] private int _tries = 4;
         [SerializeField] private Shape[] _shapesHistory;
 
-        private void Awake()
-        {
-            ResetHistory();
-        }
+        private void Awake() => ResetHistory();
 
         public void ResetHistory()
         {
