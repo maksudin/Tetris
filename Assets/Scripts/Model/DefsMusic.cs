@@ -40,6 +40,6 @@ namespace Assets.Scripts.Model
     [Serializable]
     public enum SfxType
     {
-        Cleared, Blocked, Lost, LevelUp
+        Cleared, Blocked, GameOver, LevelUp
     }
 }

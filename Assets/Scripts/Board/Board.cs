@@ -322,7 +322,7 @@ namespace Assets.Scripts.Board
             if (CheckUpperRowReached())
             {
                 OnGameOver?.Invoke();
-                OnGameOverSfx?.Invoke(SfxType.Lost);
+                OnGameOverSfx?.Invoke(SfxType.GameOver);
                 _isGameOver = true;
                 return;
             }
