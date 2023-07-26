@@ -1,2 +1,2 @@
 # Hand drawn tetris
-![Screenshot](https://github.com/maksudin/Tetris/assets/18056103/9d47a97f-3b0a-4286-baf7-ee0961fbb726)
+![Screenshot_1](https://github.com/maksudin/Tetris/assets/18056103/8b489e0d-9163-4e80-97f2-589cf5464aca)
