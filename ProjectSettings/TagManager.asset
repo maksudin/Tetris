@@ -6,6 +6,7 @@ TagManager:
   tags:
   - AudioPlayer
   - SFXPlayer
+  - Mask
   layers:
   - Default
   - TransparentFX

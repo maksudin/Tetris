@@ -21,5 +21,17 @@ namespace Assets.Scripts.Utils
                 new Vector3(pos.x - 0.5f + coord.x, pos.y + 0.5f + coord.y, 0)
             });
         }
+
+        public static void DrawMask(Vector3 pos, Vector2 coord, float scaleX)
+        {
+            DrawRectangle(new Vector3[5]
+            {
+                new Vector3(pos.x - (0.5f * scaleX) + coord.x, pos.y + 0.5f + coord.y, 0),
+                new Vector3(pos.x + (0.5f * scaleX) + coord.x, pos.y + 0.5f + coord.y, 0),
+                new Vector3(pos.x + (0.5f * scaleX) + coord.x, pos.y - 0.5f + coord.y, 0),
+                new Vector3(pos.x - (0.5f * scaleX) + coord.x, pos.y - 0.5f + coord.y, 0),
+                new Vector3(pos.x - (0.5f * scaleX) + coord.x, pos.y + 0.5f + coord.y, 0)
+            });
+        }
     }
 }

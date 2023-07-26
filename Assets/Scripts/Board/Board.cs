@@ -4,6 +4,7 @@ using Assets.Scripts.Model;
 using Assets.Scripts.Utils;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UIElements;
 
 namespace Assets.Scripts.Board
 {
@@ -20,6 +21,9 @@ namespace Assets.Scripts.Board
                       _softDropMultiplier = 1f;
 
         [SerializeField] private bool _fallEnabled;
+        [SerializeField] private ParticleSystem _particleSystem;
+        [SerializeField] private SpriteRenderer _tetrominoShadow;
+        [SerializeField] private float _shadowAlpha;
         [SerializeField] public UnityEvent OnGameOver, OnRestart, OnPause;
         [SerializeField] public SfxUnityEvent OnLinesCleared, OnPieceDestroyed, OnGameOverSfx;
 
@@ -99,8 +103,11 @@ namespace Assets.Scripts.Board
             SpawnOutline();
             SetTetrominoCoords(_spawnPivot.position);
             SetOutlineCoords(_spawnPivot.position);
+            SetMaskCoords(_spawnPivot.position);
             UpdateOutlinePosition();
         }
+
+       
 
         public void Restart()
         {
@@ -134,6 +141,32 @@ namespace Assets.Scripts.Board
 
             spawned = SpawnUtills.Spawn(_tetrominoPrefab, _spawnPivot.position);
             _tetromino = spawned.GetComponent<Tetromino>();
+            _tetromino.EnableMask();
+            SetParticlesGradient();
+            SetTetrominoShadowColor();
+        }
+
+        private void SetTetrominoShadowColor()
+        {
+            var c = _tetromino.Color;
+            _tetrominoShadow.color = new Color(c.r, c.g, c.b, _shadowAlpha);
+        }
+
+        private void SetParticlesGradient()
+        {
+            Gradient grad = new Gradient();
+            grad.SetKeys(
+                new GradientColorKey[] {
+                    new GradientColorKey(_tetromino.Color, 1.0f),
+                    new GradientColorKey(Color.white, 1.0f)
+                },
+                new GradientAlphaKey[] {
+                    new GradientAlphaKey(0.5f, 0.0f),
+                    new GradientAlphaKey(0.0f, 1.0f)
+                }
+            );
+            var col = _particleSystem.colorOverLifetime;
+            col.color = grad;
         }
 
         public void HardDrop()
@@ -178,6 +211,13 @@ namespace Assets.Scripts.Board
             _tetromino.RearrangePieces();
 
             RotateOutline();
+            ResetMaskParams();
+        }
+
+        private void ResetMaskParams()
+        {
+            var rotationsLen = _tetromino.Rotations.Length;
+            _tetromino.SetMaskParams(_rotationCount % rotationsLen);
         }
 
         private void RotateOutline()
@@ -654,6 +694,12 @@ namespace Assets.Scripts.Board
 
             SetTetrominoPosition(tetrominoCenter);
         }
+
+        private void SetMaskCoords(Vector3 position)
+        {
+            //_tetromino._spriteMask.transform.position = new Vector3(position);
+        }
+
 
         private void SetOutlineCoords(Vector3 outlineCenter)
         {
