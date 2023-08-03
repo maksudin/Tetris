@@ -148,8 +148,8 @@ namespace Assets.Scripts.Board
 
         private void SetTetrominoShadowColor()
         {
-            var c = _tetromino.Color;
-            _tetrominoShadow.color = new Color(c.r, c.g, c.b, _shadowAlpha);
+            var col = _tetromino.Color;
+            _tetrominoShadow.color = new Color(col.r, col.g, col.b, _shadowAlpha);
         }
 
         private void SetParticlesGradient()
@@ -439,7 +439,6 @@ namespace Assets.Scripts.Board
             List<Vector2> boardCellCoords = GetAllBlockedBoardCellCoords();
             for (int i = 0; i < freeBlockedCells.Count; i++)
             {
-
                 freeBlockedCells[i].Piece.XPos = (int)boardCellCoords[i].x;
                 freeBlockedCells[i].Piece.YPos = (int)boardCellCoords[i].y;
                 freeBlockedCells[i].SetSprite(_boardCellsSprites[(int)boardCellCoords[i].x, (int)boardCellCoords[i].y]);

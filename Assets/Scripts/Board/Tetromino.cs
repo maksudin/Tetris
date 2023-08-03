@@ -48,7 +48,6 @@ namespace Assets.Scripts.Board
         {
             var lScale = _spriteMask.transform.localScale;
             var y = _maskPositions[maskPositionNumber].Y - (lScale.y / 2) + 0.5f;
-            //if (y == 0) y = (lScale.y / 2) - 0.5f;
             _spriteMask.transform.localPosition = new Vector3(_maskPositions[maskPositionNumber].X, y, 0);
             _spriteMask.transform.localScale = new Vector3(_maskPositions[maskPositionNumber].scaleX, lScale.y, lScale.z);
         }
